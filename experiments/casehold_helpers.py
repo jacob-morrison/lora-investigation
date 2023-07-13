@@ -42,7 +42,7 @@ if is_torch_available():
         PyTorch multiple choice dataset class
         """
 
-        features: List[InputFeatures]
+        features=List
 
         def __init__(
             self,
@@ -68,6 +68,12 @@ if is_torch_available():
                     max_seq_length,
                     tokenizer,
                 )
+
+        def __len__(self):
+            return len(self.features)
+
+        def __getitem__(self, i) -> InputFeatures:
+            return self.features[i]
 
     class MultipleChoiceDataset(Dataset):
         """
