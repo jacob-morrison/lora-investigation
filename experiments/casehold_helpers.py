@@ -157,7 +157,7 @@ def convert_examples_to_text_to_text(
     ]
 
     inputs = []
-    labels_list = []
+    # labels_list = []
     for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
@@ -168,7 +168,7 @@ def convert_examples_to_text_to_text(
         for choice, option in zip(choices, example['endings']):
             processed_example += ' ' + choice + ' ' + option
         # processed_examples.append(processed_example)
-        labels_list.append(choices[int(example['label'])])
+        # labels_list.append(choices[int(example['label'])])
         model_inputs = tokenizer(
             processed_example,
             add_special_tokens=True,
@@ -185,10 +185,10 @@ def convert_examples_to_text_to_text(
                 truncation=True,
                 # pad_to_multiple_of=self.pad_to_multiple_of
             )
-        label_mask = labels["attention_mask"].bool()
+        # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
-        label_pad_token_id = -100
-        model_inputs["labels"] = labels["input_ids"].masked_fill(~label_mask, label_pad_token_id)
+        # label_pad_token_id = -100
+        model_inputs["labels"] = labels["input_ids"]#.masked_fill(~label_mask, label_pad_token_id)
 
         # TODO: I think T5 takes care of this automatically
         # if prepare_decoder_input_ids_from_labels:
