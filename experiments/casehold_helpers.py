@@ -157,7 +157,7 @@ def convert_examples_to_text_to_text(
     ]
 
     inputs = []
-    labels = []
+    labels_list = []
     for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
@@ -168,7 +168,7 @@ def convert_examples_to_text_to_text(
         for choice, option in zip(choices, example['endings']):
             processed_example += ' ' + choice + ' ' + option
         # processed_examples.append(processed_example)
-        labels.append(choices[int(example['label'])])
+        labels_list.append(choices[int(example['label'])])
         model_inputs = tokenizer(
             processed_example,
             add_special_tokens=True,
