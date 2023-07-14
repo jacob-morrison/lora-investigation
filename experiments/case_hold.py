@@ -344,17 +344,37 @@ def main():
 		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
 		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
+	
+	def lmap(f, x): #(f: Callable, x: Iterable) -> List:
+		"""list(map(f, x))"""
+		return list(map(f, x))
 
-	def compute_t5_metrics(dataset, preds):
-		print(dataset)
-		print(preds)
-		decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-		references = [e["Instance"]["labels"] for e in dataset]
-		result = compute_t5_metrics(predictions=decoded_preds, references=references)
-		prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
-		result["gen_len"] = np.mean(prediction_lens)
-		result = {k: round(v, 4) for k, v in result.items()}
-		return result
+	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
+		pred_ids = pred.predictions
+		label_ids = pred.label_ids
+		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
+		label_ids[label_ids == -100] = tokenizer.pad_token_id
+		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
+		pred_str = lmap(str.strip, pred_str)
+		label_str = lmap(str.strip, label_str)
+		return pred_str, label_str
+	
+	def t5_metrics(pred: EvalPrediction):
+		# compute_t5_metrics
+		pred_str, label_str = decode_pred(pred)
+		metrics = compute_t5_metrics(pred_str, label_str)
+		return metrics
+
+	# def compute_t5_metrics(dataset, preds):
+	# 	print(dataset)
+	# 	print(preds)
+	# 	decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+	# 	references = [e["Instance"]["labels"] for e in dataset]
+	# 	result = compute_t5_metrics(predictions=decoded_preds, references=references)
+	# 	prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+	# 	result["gen_len"] = np.mean(prediction_lens)
+	# 	result = {k: round(v, 4) for k, v in result.items()}
+	# 	return result
 
 	# Initialize our Trainer
 	trainer = Trainer(
@@ -362,7 +382,7 @@ def main():
 		args=training_args,
 		train_dataset=train_dataset,
 		eval_dataset=eval_dataset,
-		compute_metrics=compute_t5_metrics if config.model_type == 't5' else compute_metrics,
+		compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
 		callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
 	)
 
