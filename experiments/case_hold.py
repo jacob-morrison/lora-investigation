@@ -21,6 +21,7 @@ from transformers import (
 	AutoTokenizer,
 	EvalPrediction,
 	HfArgumentParser,
+	LlamaTokenizer,
 	Trainer,
 	TrainingArguments,
 	Seq2SeqTrainingArguments,
@@ -32,6 +33,7 @@ from casehold_helpers import MultipleChoiceDataset, Split, T2TMultipleChoiceData
 from sklearn.metrics import f1_score
 from models.deberta import DebertaForMultipleChoice
 from peft import PeftModel, PeftConfig, get_peft_config, get_peft_model, LoraConfig, TaskType
+import accelerate
 
 
 logger = logging.getLogger(__name__)
@@ -175,10 +177,28 @@ def main():
 		# Default fast tokenizer is buggy on CaseHOLD task, switch to legacy tokenizer
 		use_fast=True,
 	)
-	if 'gpt2' in model_args.model_name_or_path or 'llama' in model_args.model_name_or_path:
+	if 'gpt2' in model_args.model_name_or_path:
 		tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
 		if 'gpt2' in model_args.model_name_or_path:
 			config.pad_token_id = config.eos_token_id
+
+    # no default pad token for llama!
+    # here we add all special tokens again, because the default ones are not in the special_tokens_map
+	if isinstance(tokenizer, LlamaTokenizer):
+		num_added_tokens = tokenizer.add_special_tokens({
+			"bos_token": "<s>",
+            "eos_token": "</s>",
+            "unk_token": "<unk>",
+            "pad_token": "<pad>",
+		})
+		assert num_added_tokens in [0, 1], "LlamaTokenizer should only add one special token - the pad_token, or no tokens if pad token present."
+	# elif isinstance(tokenizer, GPT2Tokenizer) and isinstance(model, OPTForCausalLM):
+		# num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
+
+    # resize embeddings if needed (e.g. for LlamaTokenizer)
+	embedding_size = model.get_input_embeddings().weight.shape[0]
+	if len(tokenizer) > embedding_size:
+		model.resize_token_embeddings(len(tokenizer))
 
 	if config.model_type == 't5':
 		model = AutoModelForSeq2SeqLM.from_pretrained(
