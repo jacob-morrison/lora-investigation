@@ -34,6 +34,7 @@ from sklearn.metrics import f1_score, accuracy_score
 from models.deberta import DebertaForMultipleChoice
 from peft import PeftModel, PeftConfig, get_peft_config, get_peft_model, LoraConfig, TaskType
 import accelerate
+from compute_t5_metrics import compute_t5_metrics
 
 
 logger = logging.getLogger(__name__)
@@ -337,15 +338,23 @@ def main():
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics(p: EvalPrediction):
-		print(p.predictions[0])
-		print(p.label_ids)
-		print(p.predictions[0].shape)
-		preds = np.argmax(p.predictions[0], axis=1)
+		preds = np.argmax(p.predictions, axis=1)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
 		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
 		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
+
+	def compute_t5_metrics(dataset, preds):
+		print(dataset)
+		print(preds)
+		decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+		references = [e["Instance"]["labels"] for e in dataset]
+		result = compute_t5_metrics(predictions=decoded_preds, references=references)
+		prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+		result["gen_len"] = np.mean(prediction_lens)
+		result = {k: round(v, 4) for k, v in result.items()}
+		return result
 
 	# Initialize our Trainer
 	trainer = Trainer(
@@ -353,7 +362,7 @@ def main():
 		args=training_args,
 		train_dataset=train_dataset,
 		eval_dataset=eval_dataset,
-		compute_metrics=compute_metrics,
+		compute_metrics=compute_t5_metrics if config.model_type == 't5' else compute_metrics,
 		callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
 	)
 
