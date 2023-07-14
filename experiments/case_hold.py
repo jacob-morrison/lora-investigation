@@ -22,6 +22,7 @@ from transformers import (
 	HfArgumentParser,
 	Trainer,
 	TrainingArguments,
+	Seq2SeqTrainingArguments,
 	set_seed,
 )
 from transformers.trainer_utils import is_main_process
@@ -114,7 +115,8 @@ def main():
 	# or by passing the --help flag to this script.
 	# We now keep distinct sets of args, for a cleaner separation of concerns.
 
-	parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
+	# parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
+	parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
 	# Add custom arguments for computing pre-train loss
 	parser.add_argument("--ptl", type=bool, default=False)
 	model_args, data_args, training_args, custom_args = parser.parse_args_into_dataclasses()
