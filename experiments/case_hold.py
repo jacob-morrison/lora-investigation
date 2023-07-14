@@ -201,7 +201,7 @@ def main():
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
             cache_dir=model_args.cache_dir,
-			device_map = 'auto',
+			# device_map = 'auto',
         )
 	# TODO: test this out
 	elif config.model_type == 'gpt2' or config.model_type == 'llama':
@@ -210,7 +210,7 @@ def main():
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
             cache_dir=model_args.cache_dir,
-        	device_map = 'auto',
+        	# device_map = 'auto',
 		)
 	elif config.model_type != 'deberta':
 		model = AutoModelForMultipleChoice.from_pretrained(
@@ -218,7 +218,7 @@ def main():
 			from_tf=bool(".ckpt" in model_args.model_name_or_path),
 			config=config,
 			cache_dir=model_args.cache_dir,
-        	device_map = 'auto',
+        	# device_map = 'auto',
 		)
 	else:
 		model = DebertaForMultipleChoice.from_pretrained(
@@ -226,7 +226,7 @@ def main():
 			from_tf=bool(".ckpt" in model_args.model_name_or_path),
 			config=config,
 			cache_dir=model_args.cache_dir,
-        	device_map = 'auto',
+        	# device_map = 'auto',
 		)
 
     # resize embeddings if needed (e.g. for LlamaTokenizer)
