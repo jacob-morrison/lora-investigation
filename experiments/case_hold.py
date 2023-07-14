@@ -195,11 +195,6 @@ def main():
 	# elif isinstance(tokenizer, GPT2Tokenizer) and isinstance(model, OPTForCausalLM):
 		# num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
 
-    # resize embeddings if needed (e.g. for LlamaTokenizer)
-	embedding_size = model.get_input_embeddings().weight.shape[0]
-	if len(tokenizer) > embedding_size:
-		model.resize_token_embeddings(len(tokenizer))
-
 	if config.model_type == 't5':
 		model = AutoModelForSeq2SeqLM.from_pretrained(
             model_args.model_name_or_path,
@@ -233,6 +228,11 @@ def main():
 			cache_dir=model_args.cache_dir,
         	device_map = 'auto',
 		)
+
+    # resize embeddings if needed (e.g. for LlamaTokenizer)
+	embedding_size = model.get_input_embeddings().weight.shape[0]
+	if len(tokenizer) > embedding_size:
+		model.resize_token_embeddings(len(tokenizer))
 
 	if model_args.use_lora:
 		peft_config = LoraConfig(
