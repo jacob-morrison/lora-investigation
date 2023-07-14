@@ -30,7 +30,7 @@ from transformers import (
 from transformers.trainer_utils import is_main_process
 from transformers import EarlyStoppingCallback
 from casehold_helpers import MultipleChoiceDataset, Split, T2TMultipleChoiceDataset
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 from models.deberta import DebertaForMultipleChoice
 from peft import PeftModel, PeftConfig, get_peft_config, get_peft_model, LoraConfig, TaskType
 import accelerate
@@ -339,9 +339,10 @@ def main():
 	def compute_metrics(p: EvalPrediction):
 		preds = np.argmax(p.predictions, axis=1)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
+		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
 		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
-		return {'macro-f1': macro_f1, 'micro-f1': micro_f1}
+		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 
 	# Initialize our Trainer
 	trainer = Trainer(

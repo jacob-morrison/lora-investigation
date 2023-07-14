@@ -184,7 +184,7 @@ def convert_examples_to_text_to_text(
         )
         with tokenizer.as_target_tokenizer():
             labels = tokenizer(
-                choices[int(example['label'])],
+                choices[int(example['label'])].replace('(', '').replace(')', ''),
                 max_length=max_length,
                 padding="max_length",
                 # return_tensors=self.return_tensors,
