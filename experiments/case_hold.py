@@ -16,6 +16,7 @@ import transformers
 from transformers import (
 	AutoConfig,
 	AutoModelForSeq2SeqLM,
+	AutoModelForCausalLM,
 	AutoModelForMultipleChoice,
 	AutoTokenizer,
 	EvalPrediction,
@@ -185,13 +186,24 @@ def main():
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
             cache_dir=model_args.cache_dir,
+			device_map = 'auto',
         )
+	# TODO: test this out
+	elif config.model_type == 'gpt2' or config.model_type == 'llama':
+		model = AutoModelForCausalLM.from_pretrained(
+            model_args.model_name_or_path,
+            from_tf=bool(".ckpt" in model_args.model_name_or_path),
+            config=config,
+            cache_dir=model_args.cache_dir,
+        	device_map = 'auto',
+		)
 	elif config.model_type != 'deberta':
 		model = AutoModelForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
 			from_tf=bool(".ckpt" in model_args.model_name_or_path),
 			config=config,
 			cache_dir=model_args.cache_dir,
+        	device_map = 'auto',
 		)
 	else:
 		model = DebertaForMultipleChoice.from_pretrained(
@@ -199,6 +211,7 @@ def main():
 			from_tf=bool(".ckpt" in model_args.model_name_or_path),
 			config=config,
 			cache_dir=model_args.cache_dir,
+        	device_map = 'auto',
 		)
 
 	if model_args.use_lora:
@@ -214,6 +227,17 @@ def main():
 	# If do_train passed, train_dataset by default loads train split from file named train.csv in data directory
 	if training_args.do_train:
 		if config.model_type == 't5':
+			train_dataset = \
+				T2TMultipleChoiceDataset(
+					tokenizer=tokenizer,
+					task=data_args.task_name,
+					max_seq_length=data_args.max_seq_length,
+					overwrite_cache=data_args.overwrite_cache,
+					mode=Split.train,
+					text_to_text=True
+				)
+		# TODO: test this out
+		elif config.model_type == 'gpt2' or config.model_type == 'llama':
 			train_dataset = \
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
