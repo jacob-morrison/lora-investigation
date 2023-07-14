@@ -350,14 +350,14 @@ def main():
 		return list(map(f, x))
 
 	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
-		pred_ids = pred.predictions
+		pred_ids = pred.predictions[0]
 		label_ids = pred.label_ids
 		print(pred)
 		print(pred_ids)
 		print(label_ids)
 		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		label_ids[label_ids == -100] = tokenizer.pad_token_id
-		label_str = tokenizer.batch_decode(label_ids[0], skip_special_tokens=True)
+		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
 		pred_str = lmap(str.strip, pred_str)
 		label_str = lmap(str.strip, label_str)
 		return pred_str, label_str
