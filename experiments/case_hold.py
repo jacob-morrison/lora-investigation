@@ -396,10 +396,10 @@ def main():
 					pred_line = '\t'.join([f'{pred:.5f}' for pred in pred_list])
 					writer.write(f"{index}\t{pred_line}\n")
 
-	# Clean up checkpoints
-	checkpoints = [filepath for filepath in glob.glob(f'{training_args.output_dir}/*/') if '/checkpoint' in filepath]
-	for checkpoint in checkpoints:
-		shutil.rmtree(checkpoint)
+	# # Clean up checkpoints
+	# checkpoints = [filepath for filepath in glob.glob(f'{training_args.output_dir}/*/') if '/checkpoint' in filepath]
+	# for checkpoint in checkpoints:
+	# 	shutil.rmtree(checkpoint)
 
 
 def _mp_fn(index):
