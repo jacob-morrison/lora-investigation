@@ -337,6 +337,8 @@ def main():
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics(p: EvalPrediction):
+		print(p.predictions[0])
+		print(p.label_ids)
 		print(p.predictions[0].shape)
 		preds = np.argmax(p.predictions[0], axis=1)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
