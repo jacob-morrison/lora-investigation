@@ -6,7 +6,6 @@ import os
 import argparse
 import logging
 from collections import Counter
-from rouge import rouge_scorer
 from transformers import AutoTokenizer
 import collections
 
