@@ -379,6 +379,11 @@ def main():
 	# 	result = {k: round(v, 4) for k, v in result.items()}
 	# 	return result
 
+	print('args')
+	print(data_args)
+	print(training_args)
+	print(model_args)
+
 	# Initialize our Trainer
 	trainer = Trainer(
 		model=model,
