@@ -358,10 +358,10 @@ def main():
 		trainer.train(
 			model_path=model_args.model_name_or_path if os.path.isdir(model_args.model_name_or_path) else None
 		)
-		# trainer.save_model()
+		trainer.save_model()
 		# # Re-save the tokenizer for model sharing
-		# if trainer.is_world_process_zero():
-		# 	tokenizer.save_pretrained(training_args.output_dir)
+		if trainer.is_world_process_zero():
+			tokenizer.save_pretrained(training_args.output_dir)
 
 	# Evaluation on eval_dataset
 	if training_args.do_eval:
