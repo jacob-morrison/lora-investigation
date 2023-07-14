@@ -352,6 +352,9 @@ def main():
 	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
 		pred_ids = pred.predictions
 		label_ids = pred.label_ids
+		print(pred)
+		print(pred_ids)
+		print(label_ids)
 		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		label_ids[label_ids == -100] = tokenizer.pad_token_id
 		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
