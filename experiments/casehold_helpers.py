@@ -227,8 +227,11 @@ def convert_examples_to_text_to_text(
         print(input_ids)
         print(attention_mask)
         print(label)
-        print(attention_mask.shape)
-        print(label.shape)
+        input_ids = input_ids.unsqueeze(0)
+        attention_mask = attention_mask.unsqueeze(0)
+        print(input_ids)
+        print(attention_mask)
+        print(label)
         # input_ids = input_ids.unsqueeze(0)
         # attention_mask = attention_mask.unsqueeze(0)
         outputs.append({
