@@ -25,6 +25,7 @@ from transformers import (
 	LlamaTokenizer,
 	Trainer,
 	TrainingArguments,
+	Seq2SeqTrainer,
 	Seq2SeqTrainingArguments,
 	set_seed,
 )
@@ -396,15 +397,26 @@ def main():
 	# 	return result
 
 	# Initialize our Trainer
-	trainer = Trainer(
-		model=model,
-		args=training_args,
-		train_dataset=train_dataset,
-		eval_dataset=eval_dataset,
-		data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-		compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
-		callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
-	)
+	if config.model_type == 't5':
+		trainer = Seq2SeqTrainer(
+			model=model,
+			args=training_args,
+			train_dataset=train_dataset,
+			eval_dataset=eval_dataset,
+			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
+			compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
+			callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+		)
+	else:
+		trainer = Trainer(
+			model=model,
+			args=training_args,
+			train_dataset=train_dataset,
+			eval_dataset=eval_dataset,
+			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
+			compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
+			callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+		)
 
 	# Training
 	if training_args.do_train:
