@@ -366,6 +366,7 @@ def main():
 		pred_ids = pred.predictions[0]
 		label_ids = pred.label_ids
 
+		print('predictions')
 		print(pred)
 		print(pred.predictions)
 		print(pred_ids)
@@ -375,8 +376,12 @@ def main():
 		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		label_ids[label_ids == -100] = tokenizer.pad_token_id
 		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
+		print(pred_str)
+		print(label_str)
 		pred_str = lmap(str.strip, pred_str)
 		label_str = lmap(str.strip, label_str)
+		print(pred_str)
+		print(label_str)
 		return pred_str, label_str
 	
 	def t5_metrics(pred: EvalPrediction):
