@@ -321,6 +321,12 @@ def main():
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.test,
 				)
+			
+	print('args')
+	print(data_args)
+	print(training_args)
+	print(model_args)
+	print(len(train_dataset))
 
 	if training_args.do_train:
 		if data_args.max_train_samples is not None:
@@ -379,11 +385,6 @@ def main():
 	# 	result["gen_len"] = np.mean(prediction_lens)
 	# 	result = {k: round(v, 4) for k, v in result.items()}
 	# 	return result
-
-	print('args')
-	print(data_args)
-	print(training_args)
-	print(model_args)
 
 	# Initialize our Trainer
 	trainer = Trainer(
