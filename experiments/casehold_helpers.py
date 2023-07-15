@@ -72,7 +72,7 @@ if is_torch_available():
         def __len__(self):
             return len(self.features)
 
-        def __getitem__(self, i) -> InputFeatures:
+        def __getitem__(self, i):
             return self.features[i]
 
     class MultipleChoiceDataset(Dataset):
@@ -163,7 +163,8 @@ def convert_examples_to_text_to_text(
     ]
 
     inputs = []
-    # labels_list = []
+    processed_examples = []
+    labels_list = []
     for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
@@ -173,37 +174,46 @@ def convert_examples_to_text_to_text(
 
         for choice, option in zip(choices, example['endings']):
             processed_example += ' ' + choice + ' ' + option
+        processed_examples.append(processed_example)
+        labels_list.append(choices[int(example['label'])].replace('(', '').replace(')', ''))
+
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
-        model_inputs = tokenizer(
-            processed_example,
-            add_special_tokens=True,
+    model_inputs = tokenizer(
+        processed_example,
+        add_special_tokens=True,
+        max_length=max_length,
+        padding="max_length",
+        truncation=True,
+    )
+
+    with tokenizer.as_target_tokenizer():
+        labels = tokenizer(
+            labels_list,
             max_length=max_length,
             padding="max_length",
+            # return_tensors=self.return_tensors,
             truncation=True,
+            # pad_to_multiple_of=self.pad_to_multiple_of
         )
-        with tokenizer.as_target_tokenizer():
-            labels = tokenizer(
-                choices[int(example['label'])].replace('(', '').replace(')', ''),
-                max_length=max_length,
-                padding="max_length",
-                # return_tensors=self.return_tensors,
-                truncation=True,
-                # pad_to_multiple_of=self.pad_to_multiple_of
-            )
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
         # label_pad_token_id = -100
-        model_inputs["labels"] = labels["input_ids"]#.masked_fill(~label_mask, label_pad_token_id)
+    model_inputs["labels"] = labels["input_ids"]#.masked_fill(~label_mask, label_pad_token_id)
 
         # TODO: I think T5 takes care of this automatically
         # if prepare_decoder_input_ids_from_labels:
             # decoder_input_ids = self.model.prepare_decoder_input_ids_from_labels(labels=model_inputs["labels"])
             # model_inputs["decoder_input_ids"] = decoder_input_ids
 
-        inputs.append(model_inputs)
+        # inputs.append(model_inputs)
+
+    # for f in inputs[:2]:
+    #     logger.info("*** Example ***")
+    #     logger.info("input: %s" % f)
     
-    return inputs
+    # return inputs
+    return model_inputs
 
 
 def convert_examples_to_features(
