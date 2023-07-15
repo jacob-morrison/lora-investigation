@@ -220,19 +220,19 @@ def convert_examples_to_text_to_text(
     
     # return inputs
 
-    # outputs = []
+    outputs = []
 
-    # for _, _, label in zip(model_inputs["labels"], model_inputs["labels"], model_inputs["labels"]):
-    #     outputs.append({
-    #         '': _,
-    #         '': _,
-    #         'labels': label,
-    #     })
+    for input_ids, attention_mask, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs["labels"]):
+        outputs.append({
+            'input_ids': input_ids,
+            'attention_mask': attention_mask,
+            'labels': label,
+        })
 
-    print('model inputs')
-    print(model_inputs)
+    # print('model inputs')
+    # print(model_inputs)
 
-    return model_inputs
+    return outputs
 
 
 def convert_examples_to_features(
