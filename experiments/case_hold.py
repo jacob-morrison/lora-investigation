@@ -19,6 +19,7 @@ from transformers import (
 	AutoModelForCausalLM,
 	AutoModelForMultipleChoice,
 	AutoTokenizer,
+	DataCollatorForSeq2Seq,
 	EvalPrediction,
 	HfArgumentParser,
 	LlamaTokenizer,
@@ -390,6 +391,7 @@ def main():
 		args=training_args,
 		train_dataset=train_dataset,
 		eval_dataset=eval_dataset,
+		data_collator=DataCollatorForSeq2Seq if config.model_type == 't5' else None,
 		compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
 		callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
 	)
