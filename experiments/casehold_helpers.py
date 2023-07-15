@@ -64,13 +64,8 @@ if is_torch_available():
                 elif mode == Split.train:
                     examples = dataset['train']
                 logger.info("Training examples: %s", len(examples))
-                print('examples')
-                print(examples)
                 if max_samples is not None:
-                    print('subset of training')
-                    print(max_samples)
                     examples = examples[:max_samples]
-                    print(examples)
                 self.features = convert_examples_to_text_to_text(
                     examples,
                     max_seq_length,
@@ -169,26 +164,23 @@ def convert_examples_to_text_to_text(
         '(D)',
         '(E)',
     ]
-
+    contexts = examples['context']
+    endings = examples['endings']
+    labels = examples['labels']
     inputs = []
     processed_examples = []
     labels_list = []
-    print('printing examples')
-    print(examples)
-    for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to t2t"):
+    for (ex_index, context) in tqdm.tqdm(enumerate(contexts), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
-            logger.info("Writing example %d of %d" % (ex_index, len(examples)))
-        print('printing an example here')
-        print(example)
-        print(example['context'])
-        processed_example = example['context'] + '. '
+            logger.info("Writing example %d of %d" % (ex_index, len(contexts)))
+        processed_example = context + '. '
         if include_instruction:
             pass
 
-        for choice, option in zip(choices, example['endings']):
+        for choice, option in zip(choices, endings[ex_index]):
             processed_example += ' ' + choice + ' ' + option
         processed_examples.append(processed_example)
-        labels_list.append(choices[int(example['label'])].replace('(', '').replace(')', ''))
+        labels_list.append(choices[int(labels[ex_index])].replace('(', '').replace(')', ''))
 
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
@@ -201,7 +193,7 @@ def convert_examples_to_text_to_text(
     )
 
     with tokenizer.as_target_tokenizer():
-        labels = tokenizer(
+        tokenized_labels = tokenizer(
             labels_list,
             max_length=max_length,
             padding="max_length",
@@ -212,7 +204,7 @@ def convert_examples_to_text_to_text(
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
         # label_pad_token_id = -100
-    model_inputs["labels"] = labels["input_ids"]#.masked_fill(~label_mask, label_pad_token_id)
+    model_inputs["labels"] = tokenized_labels["input_ids"]#.masked_fill(~label_mask, label_pad_token_id)
 
         # TODO: I think T5 takes care of this automatically
         # if prepare_decoder_input_ids_from_labels:
