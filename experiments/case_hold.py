@@ -177,7 +177,7 @@ def main():
 		model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
 		cache_dir=model_args.cache_dir,
 		# Default fast tokenizer is buggy on CaseHOLD task, switch to legacy tokenizer
-		use_fast=True,
+		use_fast=False, # True,
 	)
 	if 'gpt2' in model_args.model_name_or_path:
 		tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
