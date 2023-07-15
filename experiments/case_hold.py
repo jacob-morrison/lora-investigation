@@ -326,7 +326,7 @@ def main():
 	print(data_args)
 	print(training_args)
 	print(model_args)
-	print(len(train_dataset))
+	print(train_dataset)
 
 	if training_args.do_train:
 		if data_args.max_train_samples is not None:
