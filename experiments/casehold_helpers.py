@@ -72,12 +72,6 @@ if is_torch_available():
                     tokenizer,
                 )
 
-        def __len__(self):
-            return len(self.features)
-
-        def __getitem__(self, i):
-            return self.features[i]
-
     class MultipleChoiceDataset(Dataset):
         """
         PyTorch multiple choice dataset class
