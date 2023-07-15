@@ -257,7 +257,7 @@ def main():
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
 					text_to_text=True,
-					max_train_samples=data_args.max_train_samples,
+					max_samples=data_args.max_train_samples,
 				)
 		# TODO: test this out
 		elif config.model_type == 'gpt2' or config.model_type == 'llama':
@@ -269,7 +269,7 @@ def main():
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
 					text_to_text=True,
-					max_train_samples=data_args.max_train_samples,
+					max_samples=data_args.max_train_samples,
 				)
 		else:
 			train_dataset = \
@@ -292,7 +292,7 @@ def main():
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.dev,
 					text_to_text=True,
-					max_train_samples=data_args.max_train_samples,
+					max_samples=data_args.max_eval_samples,
 				)
 		else:
 			eval_dataset = \
@@ -314,7 +314,7 @@ def main():
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.test,
 					text_to_text=True,
-					max_train_samples=data_args.max_train_samples,
+					max_samples=data_args.max_predict_samples,
 				)
 		else:
 			predict_dataset = \

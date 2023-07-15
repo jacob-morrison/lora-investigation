@@ -52,7 +52,7 @@ if is_torch_available():
             overwrite_cache=False,
             mode: Split = Split.train,
             text_to_text: bool=False,
-            max_train_samples: Optional[int] = None,
+            max_samples: Optional[int] = None,
         ):
             dataset = datasets.load_dataset('lex_glue', task)
 
@@ -64,8 +64,8 @@ if is_torch_available():
                 elif mode == Split.train:
                     examples = dataset['train']
                 logger.info("Training examples: %s", len(examples))
-                if max_train_samples is not None:
-                    examples = examples[:max_train_samples]
+                if max_samples is not None:
+                    examples = examples[:max_samples]
                 self.features = convert_examples_to_text_to_text(
                     examples,
                     max_seq_length,
