@@ -363,7 +363,7 @@ def main():
 		return list(map(f, x))
 
 	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
-		pred_ids = pred.predictions[0]
+		pred_ids = pred.predictions
 		label_ids = pred.label_ids
 
 		print('predictions')
