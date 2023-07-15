@@ -256,7 +256,8 @@ def main():
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
-					text_to_text=True
+					text_to_text=True,
+					max_train_samples=data_args.max_train_samples,
 				)
 		# TODO: test this out
 		elif config.model_type == 'gpt2' or config.model_type == 'llama':
@@ -267,7 +268,8 @@ def main():
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
-					text_to_text=True
+					text_to_text=True,
+					max_train_samples=data_args.max_train_samples,
 				)
 		else:
 			train_dataset = \
@@ -289,7 +291,8 @@ def main():
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.dev,
-					text_to_text=True
+					text_to_text=True,
+					max_train_samples=data_args.max_train_samples,
 				)
 		else:
 			eval_dataset = \
@@ -310,7 +313,8 @@ def main():
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.test,
-					text_to_text=True
+					text_to_text=True,
+					max_train_samples=data_args.max_train_samples,
 				)
 		else:
 			predict_dataset = \
@@ -328,20 +332,21 @@ def main():
 	print(model_args)
 	print(train_dataset)
 
-	if training_args.do_train:
-		if data_args.max_train_samples is not None:
-			train_dataset = train_dataset[:data_args.max_train_samples]
-		# Log a few random samples from the training set:
-		for index in random.sample(range(len(train_dataset)), 3):
-			logger.info(f"Sample {index} of the training set: {train_dataset[index]}.")
+	if config.model_type != 't5':
+		if training_args.do_train:
+			if data_args.max_train_samples is not None:
+				train_dataset = train_dataset[:data_args.max_train_samples]
+			# Log a few random samples from the training set:
+			for index in random.sample(range(len(train_dataset)), 3):
+				logger.info(f"Sample {index} of the training set: {train_dataset[index]}.")
 
-	if training_args.do_eval:
-		if data_args.max_eval_samples is not None:
-			eval_dataset = eval_dataset[:data_args.max_eval_samples]
+		if training_args.do_eval:
+			if data_args.max_eval_samples is not None:
+				eval_dataset = eval_dataset[:data_args.max_eval_samples]
 
-	if training_args.do_predict:
-		if data_args.max_predict_samples is not None:
-			predict_dataset = predict_dataset[:data_args.max_predict_samples]
+		if training_args.do_predict:
+			if data_args.max_predict_samples is not None:
+				predict_dataset = predict_dataset[:data_args.max_predict_samples]
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics(p: EvalPrediction):
