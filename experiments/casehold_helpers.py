@@ -186,7 +186,7 @@ def convert_examples_to_text_to_text(
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
     model_inputs = tokenizer(
-        processed_example,
+        processed_examples,
         add_special_tokens=True,
         max_length=max_length,
         padding="max_length",
