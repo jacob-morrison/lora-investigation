@@ -64,8 +64,11 @@ if is_torch_available():
                 elif mode == Split.train:
                     examples = dataset['train']
                 logger.info("Training examples: %s", len(examples))
+                print('examples')
+                print(examples)
                 if max_samples is not None:
                     examples = examples[:max_samples]
+                    print(examples)
                 self.features = convert_examples_to_text_to_text(
                     examples,
                     max_seq_length,
