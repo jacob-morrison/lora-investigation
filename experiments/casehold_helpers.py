@@ -166,7 +166,7 @@ def convert_examples_to_text_to_text(
     ]
     contexts = examples['context']
     endings = examples['endings']
-    labels = examples['labels']
+    labels = examples['label']
     inputs = []
     processed_examples = []
     labels_list = []
