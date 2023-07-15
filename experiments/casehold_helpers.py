@@ -174,7 +174,9 @@ def convert_examples_to_text_to_text(
     for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
+        print('printing an example here')
         print(example)
+        print(example['context'])
         processed_example = example['context'] + '. '
         if include_instruction:
             pass
