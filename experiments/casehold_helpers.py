@@ -72,6 +72,13 @@ if is_torch_available():
                     tokenizer,
                 )
 
+        # NEED TO IMPLEMENT THESE CORRECTLY
+        def __len__(self):
+            return len(self.features)
+
+        def __getitem__(self, i):
+            return self.features[i]
+
     class MultipleChoiceDataset(Dataset):
         """
         PyTorch multiple choice dataset class
@@ -212,6 +219,19 @@ def convert_examples_to_text_to_text(
     #     logger.info("input: %s" % f)
     
     # return inputs
+
+    # outputs = []
+
+    # for _, _, label in zip(model_inputs["labels"], model_inputs["labels"], model_inputs["labels"]):
+    #     outputs.append({
+    #         '': _,
+    #         '': _,
+    #         'labels': label,
+    #     })
+
+    print('model inputs')
+    print(model_inputs)
+
     return model_inputs
 
 
