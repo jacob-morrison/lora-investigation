@@ -10,6 +10,7 @@ import re
 from filelock import FileLock
 from transformers import PreTrainedTokenizer, is_tf_available, is_torch_available
 import datasets
+import torch
 
 logger = logging.getLogger(__name__)
 
@@ -227,8 +228,9 @@ def convert_examples_to_text_to_text(
         print(input_ids)
         print(attention_mask)
         print(label)
-        input_ids = input_ids.unsqueeze(0)
-        attention_mask = attention_mask.unsqueeze(0)
+        input_ids = torch.FloatTensor(input_ids).unsqueeze(0)
+        attention_mask = torch.FloatTensor(attention_mask).unsqueeze(0)
+        label = torch.FloatTensor(label)
         print(input_ids)
         print(attention_mask)
         print(label)
