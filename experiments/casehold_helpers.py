@@ -67,6 +67,8 @@ if is_torch_available():
                 print('examples')
                 print(examples)
                 if max_samples is not None:
+                    print('subset of training')
+                    print(max_samples)
                     examples = examples[:max_samples]
                     print(examples)
                 self.features = convert_examples_to_text_to_text(
@@ -171,6 +173,8 @@ def convert_examples_to_text_to_text(
     inputs = []
     processed_examples = []
     labels_list = []
+    print('printing examples')
+    print(examples)
     for (ex_index, example) in tqdm.tqdm(enumerate(examples), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
