@@ -420,6 +420,8 @@ def main():
 			callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
 		)
 
+	trainer.evaluate()
+
 	# Training
 	if training_args.do_train:
 		trainer.train(
