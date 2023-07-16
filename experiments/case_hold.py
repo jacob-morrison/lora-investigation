@@ -410,7 +410,7 @@ def main():
 			eval_dataset=eval_dataset,
 			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
 			compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
-			callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+			callbacks=[EarlyStoppingCallback(early_stopping_patience=15)]
 		)
 	else:
 		trainer = Trainer(
