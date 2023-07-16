@@ -200,6 +200,7 @@ def convert_examples_to_text_to_text(
             labels_list,
             max_length=max_length,
             padding="max_length",
+            add_special_tokens=True,
             # return_tensors=self.return_tensors,
             truncation=True,
             # pad_to_multiple_of=self.pad_to_multiple_of
