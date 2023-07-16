@@ -180,12 +180,13 @@ def convert_examples_to_text_to_text(
             pass
 
         for choice, option in zip(choices, endings[ex_index]):
-            processed_example += ' ' + choice + ' ' + option
+            processed_example += choice + ' ' + option + ' '
         processed_examples.append(processed_example)
         labels_list.append(choices[int(labels[ex_index])].replace('(', '').replace(')', ''))
 
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
+    print(processed_examples)
     model_inputs = tokenizer(
         processed_examples,
         add_special_tokens=True,
@@ -224,16 +225,9 @@ def convert_examples_to_text_to_text(
     outputs = []
 
     for input_ids, attention_mask, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs["labels"]):
-        print('shapes')
-        # print(input_ids)
-        # print(attention_mask)
-        # print(label)
         input_ids = torch.tensor(input_ids)#.unsqueeze(0)
         attention_mask = torch.tensor(attention_mask)#.unsqueeze(0)
         label = torch.tensor(label)
-        print(input_ids.shape)
-        print(attention_mask.shape)
-        print(label.shape)
         outputs.append({
             'input_ids': input_ids,
             'attention_mask': attention_mask,
