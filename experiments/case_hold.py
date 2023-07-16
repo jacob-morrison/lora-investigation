@@ -367,12 +367,9 @@ def main():
 		label_ids = pred.label_ids
 
 		print('predictions')
-		print(pred)
 		print(pred.predictions)
 		print(pred_ids)
 		print(label_ids)
-		print(pred_ids.shape)
-		print(label_ids.shape)
 		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		label_ids[label_ids == -100] = tokenizer.pad_token_id
 		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
