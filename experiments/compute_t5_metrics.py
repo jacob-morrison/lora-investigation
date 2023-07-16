@@ -26,7 +26,7 @@ def normalize_answer(s):
     def lower(text):
         return text.lower()
 
-    return white_space_fix(remove_punc(lower(s)))
+    return white_space_fix(remove_punc(lower(s))).replace('(', '').replace(')', '')
 
 
 def exact_match_score(prediction, ground_truth, xlingual=False):
