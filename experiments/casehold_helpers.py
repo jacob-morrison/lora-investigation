@@ -193,6 +193,7 @@ def convert_examples_to_text_to_text(
         max_length=max_length,
         padding="max_length",
         truncation=True,
+        return_tensors="pt",
     )
 
     with tokenizer.as_target_tokenizer():
@@ -201,7 +202,7 @@ def convert_examples_to_text_to_text(
             max_length=max_length,
             padding="max_length",
             add_special_tokens=True,
-            # return_tensors=self.return_tensors,
+            return_tensors="pt",
             truncation=True,
             # pad_to_multiple_of=self.pad_to_multiple_of
         )
@@ -226,9 +227,9 @@ def convert_examples_to_text_to_text(
     outputs = []
 
     for input_ids, attention_mask, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs["labels"]):
-        input_ids = torch.tensor(input_ids)#.unsqueeze(0)
-        attention_mask = torch.tensor(attention_mask)#.unsqueeze(0)
-        label = torch.tensor(label)
+        # input_ids = torch.tensor(input_ids)#.unsqueeze(0)
+        # attention_mask = torch.tensor(attention_mask)#.unsqueeze(0)
+        # label = torch.tensor(label)
         outputs.append({
             'input_ids': input_ids,
             'attention_mask': attention_mask,
