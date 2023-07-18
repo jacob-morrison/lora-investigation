@@ -161,10 +161,15 @@ def main():
 	# Set seed
 	set_seed(training_args.seed)
 
+	num_classes = {
+		'case_hold': 5,
+		'qnli': 2,
+	}
+
 	# Load pretrained model and tokenizer
 	config = AutoConfig.from_pretrained(
 		model_args.config_name if model_args.config_name else model_args.model_name_or_path,
-		num_labels=5,
+		num_labels=num_classes[data_args.task_name],
 		finetuning_task=data_args.task_name,
 		cache_dir=model_args.cache_dir,
 	)
@@ -178,7 +183,7 @@ def main():
 		model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
 		cache_dir=model_args.cache_dir,
 		# Default fast tokenizer is buggy on CaseHOLD task, switch to legacy tokenizer
-		use_fast=False, # True,
+		use_fast=data_args.task_name != 'case_hold', # True,
 	)
 	if 'gpt2' in model_args.model_name_or_path:
 		tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
