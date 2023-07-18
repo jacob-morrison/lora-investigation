@@ -106,6 +106,8 @@ if is_torch_available():
                 dataset = datasets.load_dataset('glue', task)
 
             tokenizer_name = re.sub('[^a-z]+', ' ', tokenizer.name_or_path).title().replace(' ', '')
+            if tokenizer_name == 'RobertaBase':
+                tokenizer_name += '2'
             cached_features_file = os.path.join(
                 '.cache',
                 task,
