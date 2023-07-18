@@ -184,7 +184,7 @@ def convert_examples_to_text_to_text(
             'true',
             'false',
         ]
-        context = examples['sentence']
+        contexts = examples['sentence']
         questions = examples['question']
         labels = examples['label']
     inputs = []
