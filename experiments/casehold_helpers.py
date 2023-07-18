@@ -71,6 +71,7 @@ if is_torch_available():
                     examples,
                     max_seq_length,
                     tokenizer,
+                    task,
                 )
 
         # NEED TO IMPLEMENT THESE CORRECTLY
@@ -135,6 +136,7 @@ if is_torch_available():
                         examples,
                         max_seq_length,
                         tokenizer,
+                        task,
                     )
                     logger.info("Saving features into cached file %s", cached_features_file)
                     torch.save(self.features, cached_features_file)
@@ -149,6 +151,7 @@ def convert_examples_to_text_to_text(
         examples: datasets.Dataset,
         max_length: int,
         tokenizer: PreTrainedTokenizer,
+        task: str,
         include_instruction: bool=False,
         prepare_decoder_input_ids_from_labels: bool=False,
 ):
@@ -159,28 +162,42 @@ def convert_examples_to_text_to_text(
     # put each example together
     # TODO: are we including an instruction? idk, probably not if we're using raw T5, yes if multitask?
 
-    choices = [
-        '(A)',
-        '(B)',
-        '(C)',
-        '(D)',
-        '(E)',
-    ]
-    contexts = examples['context']
-    endings = examples['endings']
-    labels = examples['label']
+    if task == 'case_hold':
+        choices = [
+            '(A)',
+            '(B)',
+            '(C)',
+            '(D)',
+            '(E)',
+        ]
+        contexts = examples['context']
+        endings = examples['endings']
+        labels = examples['label']
+    elif task == 'qnli':
+        choices = [
+            'true',
+            'false',
+        ]
+        context = examples['sentence']
+        questions = examples['question']
+        labels = examples['label']
     inputs = []
     processed_examples = []
     labels_list = []
     for (ex_index, context) in tqdm.tqdm(enumerate(contexts), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(contexts)))
-        processed_example = context + '. '
-        if include_instruction:
-            pass
+        if task == 'case_hold':
+            processed_example = context + '. '
+            if include_instruction:
+                pass
 
-        for choice, option in zip(choices, endings[ex_index]):
-            processed_example += choice + ' ' + option + ' '
+            for choice, option in zip(choices, endings[ex_index]):
+                processed_example += choice + ' ' + option + ' '
+        elif task == 'qnli':
+            processed_example = context + '. ' + questions[ex_index] + ' '
+            if include_instruction:
+                pass
         processed_examples.append(processed_example)
         labels_list.append(choices[int(labels[ex_index])].replace('(', '').replace(')', ''))
 
@@ -246,6 +263,7 @@ def convert_examples_to_features(
     examples: datasets.Dataset,
     max_length: int,
     tokenizer: PreTrainedTokenizer,
+    task: str,
 ) -> List[InputFeatures]:
     """
     Loads a data file into a list of `InputFeatures`
@@ -255,11 +273,25 @@ def convert_examples_to_features(
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
         choices_inputs = []
-        for ending_idx, ending in enumerate(example['endings']):
-            context = example['context']
+        if task == 'case_hold':
+            for ending_idx, ending in enumerate(example['endings']):
+                context = example['context']
+                inputs = tokenizer(
+                    context,
+                    ending,
+                    add_special_tokens=True,
+                    max_length=max_length,
+                    padding="max_length",
+                    truncation=True,
+                )
+
+                choices_inputs.append(inputs)
+        elif task == 'qnli':
+            sentence = example['sentence']
+            question = example['question']
             inputs = tokenizer(
-                context,
-                ending,
+                sentence,
+                question,
                 add_special_tokens=True,
                 max_length=max_length,
                 padding="max_length",
