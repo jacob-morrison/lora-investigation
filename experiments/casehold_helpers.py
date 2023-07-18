@@ -55,7 +55,10 @@ if is_torch_available():
             text_to_text: bool=False,
             max_samples: Optional[int] = None,
         ):
-            dataset = datasets.load_dataset('lex_glue', task)
+            if task == 'case_hold':
+                dataset = datasets.load_dataset('lex_glue', task)
+            elif task == 'qnli':
+                dataset = datasets.load_dataset('glue', task)
 
             if text_to_text:
                 if mode == Split.dev:
@@ -97,7 +100,10 @@ if is_torch_available():
             mode: Split = Split.train,
             text_to_text: bool=False,
         ):
-            dataset = datasets.load_dataset('lex_glue', task)
+            if task == 'case_hold':
+                dataset = datasets.load_dataset('lex_glue', task)
+            elif task == 'qnli':
+                dataset = datasets.load_dataset('glue', task)
 
             tokenizer_name = re.sub('[^a-z]+', ' ', tokenizer.name_or_path).title().replace(' ', '')
             cached_features_file = os.path.join(
