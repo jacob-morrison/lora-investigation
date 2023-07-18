@@ -6,7 +6,7 @@
 # datasets
 # nltk
 # scipy
-torch<2.0.0
+torch==2.0.1
 accelerate
 transformers>=4.9.0
 scikit-learn>=0.24.1
