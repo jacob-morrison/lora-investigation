@@ -174,6 +174,8 @@ def main():
 		cache_dir=model_args.cache_dir,
 	)
 
+	print('num classes: ' + str(num_classes[data_args.task_name]))
+
 	if config.model_type == 'big_bird':
 		config.attention_type = 'original_full'
 	elif config.model_type == 'longformer':

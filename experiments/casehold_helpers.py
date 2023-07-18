@@ -316,19 +316,6 @@ def convert_examples_to_features(
             [x["token_type_ids"] for x in choices_inputs] if "token_type_ids" in choices_inputs[0] else None
         )
 
-        max_input_ids_length = -1
-        for ids in input_ids:
-            if len(ids) > max_input_ids_length:
-                max_input_ids_length = len(ids)
-        
-        labels_list = []
-        for label in labels:
-            if label not in labels_list:
-                labels_list.append(label)
-        
-        print('max input id length: ' + str(max_input_ids_length))
-        print('labels list: ' + str(labels_list))
-
         features.append(
             InputFeatures(
                 input_ids=input_ids,
@@ -341,5 +328,18 @@ def convert_examples_to_features(
     for f in features[:2]:
         logger.info("*** Example ***")
         logger.info("feature: %s" % f)
+        
+    max_input_ids_length = -1
+    labels_list = []
+    for f in features:
+        for input_id in f.input_ids:
+            if len(input_id) > max_input_ids_length:
+                max_input_ids_length = len(input_id)
+        
+        if f.label not in labels_list:
+            labels_list.append(f.label)
+        
+    print('max input id length: ' + str(max_input_ids_length))
+    print('labels list: ' + str(labels_list))
 
     return features
