@@ -75,7 +75,7 @@ def compute_t5_metrics(predictions, references, xlingual=False):
         )
     exact_match = 100.0 * exact_match / len(references)
     f1 = 100.0 * f1 / len(references)
-    metrics = {"exact_match": exact_match, "f1": f1}
+    metrics = {"accuracy": exact_match, "f1": f1}
     # metrics = {k: round(v, 4) for k, v in metrics.items()}
     return metrics
 
