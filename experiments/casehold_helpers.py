@@ -211,7 +211,7 @@ def convert_examples_to_text_to_text(
 
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
-    print(processed_examples)
+    # print(processed_examples)
     model_inputs = tokenizer(
         processed_examples,
         add_special_tokens=True,
@@ -224,7 +224,7 @@ def convert_examples_to_text_to_text(
     with tokenizer.as_target_tokenizer():
         tokenized_labels = tokenizer(
             labels_list,
-            max_length=max_length,
+            max_length=1, #max_length,
             padding="max_length",
             add_special_tokens=True,
             return_tensors="pt",

@@ -127,6 +127,8 @@ def main():
 	parser.add_argument("--ptl", type=bool, default=False)
 	model_args, data_args, training_args, custom_args = parser.parse_args_into_dataclasses()
 
+	transformers.logging.set_verbosity_error()
+
 	if (
 		os.path.exists(training_args.output_dir)
 		and os.listdir(training_args.output_dir)
@@ -357,13 +359,27 @@ def main():
 				predict_dataset = predict_dataset[:data_args.max_predict_samples]
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
+	def compute_metrics_rank_classification(p: EvalPrediction):
+		logits = p.predictions[0].transpose([1, 0, 2])[1].transpose()[tokenized_labels].transpose()
+		print(logits)
+		# preds = np.argmax(p.predictions, axis=1)
+		preds = tokenized_labels[np.argmax(logits, axis=1)]
+		print(p.label_ids.transpose()[0])
+		print(preds)
+		print()
+		# Compute macro and micro F1 for 5-class CaseHOLD task
+		accuracy = accuracy_score(y_true=p.label_ids.transpose()[0], y_pred = preds)
+		macro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='micro', zero_division=0)
+		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
+	
+	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics(p: EvalPrediction):
 		preds = np.argmax(p.predictions, axis=1)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
 		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
-		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
+		return {'macro-f1': macro_f1, 'micro-f1': micro_f1}
 	
 	def lmap(f, x): #(f: Callable, x: Iterable) -> List:
 		"""list(map(f, x))"""
@@ -403,6 +419,26 @@ def main():
 	# 	result = {k: round(v, 4) for k, v in result.items()}
 	# 	return result
 
+	label_map = {
+		'case_hold': ['A', 'B', 'C', 'D', 'E',],
+		'qnli': ['true', 'false'],
+	}
+
+	with tokenizer.as_target_tokenizer():
+		tokenized_labels = tokenizer(
+            label_map[data_args.task_name],
+            max_length=1, #max_length,
+            padding="max_length",
+            add_special_tokens=False,
+            return_tensors="pt",
+            truncation=False,
+            # pad_to_multiple_of=self.pad_to_multiple_of
+        )
+	tokenized_labels = np.sort(tokenized_labels.input_ids.squeeze(1).numpy())
+
+	print('label list here!!!!')
+	print(tokenized_labels)
+
 	# Initialize our Trainer
 	if config.model_type == 't5':
 		trainer = Seq2SeqTrainer(
@@ -411,7 +447,7 @@ def main():
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
 			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-			compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
+			compute_metrics=compute_metrics_rank_classification,
 			callbacks=[]
 		)
 	else:
@@ -420,8 +456,8 @@ def main():
 			args=training_args,
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
-			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-			compute_metrics=t5_metrics if config.model_type == 't5' else compute_metrics,
+			data_collator=None,
+			compute_metrics=compute_metrics_rank_classification if config.model_type == 'gpt2' else compute_metrics,
 			callbacks=[]
 		)
 

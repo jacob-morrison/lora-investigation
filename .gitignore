@@ -133,3 +133,4 @@ dmypy.json
 
 # Log files
 logs/
+wandb/*
