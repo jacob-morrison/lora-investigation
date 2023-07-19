@@ -248,7 +248,6 @@ def main():
 		)
 
 	print('device info')
-	print(tokenizer.device)
 	print(model.device)
 
     # resize embeddings if needed (e.g. for LlamaTokenizer)

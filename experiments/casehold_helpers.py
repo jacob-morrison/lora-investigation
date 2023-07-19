@@ -223,6 +223,9 @@ def convert_examples_to_text_to_text(
         return_tensors="pt",
     )
 
+    print('model inputs')
+    print(model_inputs.device)
+
     with tokenizer.as_target_tokenizer():
         tokenized_labels = tokenizer(
             labels_list,
