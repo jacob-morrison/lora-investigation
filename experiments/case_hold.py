@@ -124,7 +124,7 @@ def main():
 	# or by passing the --help flag to this script.
 	# We now keep distinct sets of args, for a cleaner separation of concerns.
 
-	os.environ['CUDA_LAUNCH_BLOCKING'] = 1
+	os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 	# parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
 	parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
