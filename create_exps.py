@@ -111,7 +111,7 @@ LoRA_ranks = {
     'roberta-base': 1,
     'roberta-large': 1,
 
-    'microsoft/deberta-base': 1,
+    'microsoft/deberta-base': 3776,
     'microsoft/deberta-large': 1,
 
     'microsoft/deberta-v2-xlarge': 1,
