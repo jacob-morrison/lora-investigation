@@ -509,6 +509,7 @@ def main():
 			callbacks=[]
 		)
 
+	# TODO: uncomment
 	# trainer.evaluate()
 
 	# Training
