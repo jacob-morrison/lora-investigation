@@ -398,7 +398,10 @@ def main():
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification(p: EvalPrediction):
 		logits = p.predictions[0].transpose([1, 0, 2])[1].transpose()[tokenized_labels].transpose()
-		preds = tokenized_labels[np.argmax(logits, axis=1)]
+		# preds = tokenized_labels[np.argmax(logits, axis=1)]
+		preds = np.argmax(logits, axis=1)
+		print(preds)
+		print(tokenized_labels)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
 		accuracy = accuracy_score(y_true=p.label_ids.transpose()[0], y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='macro', zero_division=0)
@@ -410,7 +413,8 @@ def main():
 		# logits = p.predictions.transpose([1, 0, 2])[0].transpose()[tokenized_labels].transpose()
 		logits = p.predictions
 		# preds = np.argmax(p.predictions, axis=1)
-		preds = tokenized_labels[np.argmax(logits, axis=1)]
+		# preds = tokenized_labels[np.argmax(logits, axis=1)]
+		preds = np.argmax(logits, axis=1)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
 		accuracy = accuracy_score(y_true=p.label_ids.transpose()[0], y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='macro', zero_division=0)
@@ -479,7 +483,8 @@ def main():
             truncation=False,
             # pad_to_multiple_of=self.pad_to_multiple_of
         )
-	tokenized_labels = np.sort(tokenized_labels.input_ids.squeeze(1).numpy())
+	tokenized_labels = tokenized_labels.input_ids.squeeze(1).numpy()
+	sorted_tokenized_labels = np.sort(tokenized_labels)
 
 	print('label list here!!!!')
 	print(tokenized_labels)

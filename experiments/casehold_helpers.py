@@ -185,6 +185,13 @@ def convert_examples_to_text_to_text(
             '(D)',
             '(E)',
         ]
+        # label_map = {
+        #     '(A)': 0,
+        #     '(B)': 1,
+        #     '(C)': 2,
+        #     '(D)': 3,
+        #     '(E)': 4,
+        # }
         contexts = examples['context']
         endings = examples['endings']
         labels = examples['label']
@@ -193,9 +200,30 @@ def convert_examples_to_text_to_text(
             'true',
             'false',
         ]
+        # label_map = {
+        #     'true': 0,
+        #     'false': 1,
+        # }
         contexts = examples['sentence']
         questions = examples['question']
         labels = examples['label']
+    
+    # with tokenizer.as_target_tokenizer():
+    #     tokenized_labels = tokenizer(
+    #         choices,
+    #         max_length=1, #max_length,
+    #         padding="max_length",
+    #         add_special_tokens=False,
+    #         return_tensors="pt",
+    #         truncation=False,
+    #         # pad_to_multiple_of=self.pad_to_multiple_of
+    #     )
+    # tokenized_labels = tokenized_labels.input_ids.squeeze(1).numpy()
+
+    # label_map = {}
+    # for i in range(len(choices)):
+    #     label_map[choices[i]] = tokenized_labels[i]
+    
     inputs = []
     processed_examples = []
     labels_list = []
@@ -214,7 +242,7 @@ def convert_examples_to_text_to_text(
             if include_instruction:
                 pass
         processed_examples.append(processed_example)
-        labels_list.append(choices[int(labels[ex_index])].replace('(', '').replace(')', ''))
+        labels_list.append(int(labels[ex_index]))
 
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
@@ -228,20 +256,20 @@ def convert_examples_to_text_to_text(
         return_tensors="pt",
     )
 
-    with tokenizer.as_target_tokenizer():
-        tokenized_labels = tokenizer(
-            labels_list,
-            max_length=1, #max_length,
-            padding="max_length",
-            add_special_tokens=False,
-            return_tensors="pt",
-            truncation=False,
-            # pad_to_multiple_of=self.pad_to_multiple_of
-        )
+    # with tokenizer.as_target_tokenizer():
+    #     tokenized_labels = tokenizer(
+    #         labels_list,
+    #         max_length=1, #max_length,
+    #         padding="max_length",
+    #         add_special_tokens=False,
+    #         return_tensors="pt",
+    #         truncation=False,
+    #         # pad_to_multiple_of=self.pad_to_multiple_of
+    #     )
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
         # label_pad_token_id = -100
-    model_inputs["labels"] = tokenized_labels["input_ids"]#.masked_fill(~label_mask, label_pad_token_id)
+    model_inputs["labels"] = labels_list #tokenized_labels["input_ids"]#.masked_fill(~label_mask, label_pad_token_id)
 
         # TODO: I think T5 takes care of this automatically
         # if prepare_decoder_input_ids_from_labels:
@@ -249,12 +277,6 @@ def convert_examples_to_text_to_text(
             # model_inputs["decoder_input_ids"] = decoder_input_ids
 
         # inputs.append(model_inputs)
-
-    # for f in inputs[:2]:
-    #     logger.info("*** Example ***")
-    #     logger.info("input: %s" % f)
-    
-    # return inputs
 
     outputs = []
 
