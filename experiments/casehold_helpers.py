@@ -242,7 +242,7 @@ def convert_examples_to_text_to_text(
             if include_instruction:
                 pass
         processed_examples.append(processed_example)
-        labels_list.append(int(labels[ex_index]))
+        labels_list.append([int(labels[ex_index])])
 
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])

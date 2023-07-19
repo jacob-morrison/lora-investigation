@@ -397,15 +397,13 @@ def main():
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification(p: EvalPrediction):
-		logits = p.predictions[0].transpose([1, 0, 2])[1].transpose()[tokenized_labels].transpose()
+		logits = p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].transpose()
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
-		print(preds)
-		print(tokenized_labels)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=p.label_ids.transpose()[0], y_pred = preds)
-		macro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='micro', zero_division=0)
+		accuracy = accuracy_score(y_true=p.label_ids.squeeze(), y_pred = preds)
+		macro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 	
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
@@ -515,7 +513,7 @@ def main():
 	print(model.device)
 
 	# TODO: uncomment
-	# trainer.evaluate()
+	trainer.evaluate()
 
 	# Training
 	if training_args.do_train:
