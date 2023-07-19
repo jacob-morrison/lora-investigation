@@ -18,8 +18,11 @@ from transformers import (
 	AutoModelForSeq2SeqLM,
 	AutoModelForCausalLM,
 	AutoModelForMultipleChoice,
+	AutoModelForSequenceClassification,
 	AutoTokenizer,
 	DataCollatorForSeq2Seq,
+	# DataCollatorForLanguageModeling,
+	DefaultDataCollator,
 	EvalPrediction,
 	HfArgumentParser,
 	LlamaTokenizer,
@@ -31,9 +34,9 @@ from transformers import (
 )
 from transformers.trainer_utils import is_main_process
 from transformers import EarlyStoppingCallback
-from casehold_helpers import MultipleChoiceDataset, Split, T2TMultipleChoiceDataset
+from casehold_helpers import MultipleChoiceDataset, Split, T2TMultipleChoiceDataset, MyDataCollatorForLanguageModeling
 from sklearn.metrics import f1_score, accuracy_score
-from models.deberta import DebertaForMultipleChoice
+# from models.deberta import DebertaForMultipleChoice
 from peft import PeftModel, PeftConfig, get_peft_config, get_peft_model, LoraConfig, TaskType
 import accelerate
 from compute_t5_metrics import compute_t5_metrics
@@ -127,8 +130,6 @@ def main():
 	parser.add_argument("--ptl", type=bool, default=False)
 	model_args, data_args, training_args, custom_args = parser.parse_args_into_dataclasses()
 
-	transformers.logging.set_verbosity_error()
-
 	if (
 		os.path.exists(training_args.output_dir)
 		and os.listdir(training_args.output_dir)
@@ -159,6 +160,8 @@ def main():
 		transformers.utils.logging.enable_default_handler()
 		transformers.utils.logging.enable_explicit_format()
 	logger.info("Training/evaluation parameters %s", training_args)
+
+	transformers.logging.set_verbosity_error()
 
 	# Set seed
 	set_seed(training_args.seed)
@@ -217,7 +220,7 @@ def main():
         )
 	# TODO: test this out
 	elif config.model_type == 'gpt2' or config.model_type == 'llama':
-		model = AutoModelForCausalLM.from_pretrained(
+		model = AutoModelForSequenceClassification.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -304,6 +307,17 @@ def main():
 					text_to_text=True,
 					max_samples=data_args.max_eval_samples,
 				)
+		elif config.model_type == 'gpt2' or config.model_type == 'llama':
+				eval_dataset = \
+					T2TMultipleChoiceDataset(
+						tokenizer=tokenizer,
+						task=data_args.task_name,
+						max_seq_length=data_args.max_seq_length,
+						overwrite_cache=data_args.overwrite_cache,
+						mode=Split.dev,
+						text_to_text=True,
+						max_samples=data_args.max_eval_samples,
+					)
 		else:
 			eval_dataset = \
 				MultipleChoiceDataset(
@@ -326,6 +340,17 @@ def main():
 					text_to_text=True,
 					max_samples=data_args.max_predict_samples,
 				)
+		elif config.model_type == 'gpt2' or config.model_type == 'llama':
+				predict_dataset = \
+					T2TMultipleChoiceDataset(
+						tokenizer=tokenizer,
+						task=data_args.task_name,
+						max_seq_length=data_args.max_seq_length,
+						overwrite_cache=data_args.overwrite_cache,
+						mode=Split.test,
+						text_to_text=True,
+						max_samples=data_args.max_predict_samples,
+					)
 		else:
 			predict_dataset = \
 				MultipleChoiceDataset(
@@ -361,12 +386,19 @@ def main():
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification(p: EvalPrediction):
 		logits = p.predictions[0].transpose([1, 0, 2])[1].transpose()[tokenized_labels].transpose()
-		print(logits)
+		preds = tokenized_labels[np.argmax(logits, axis=1)]
+		# Compute macro and micro F1 for 5-class CaseHOLD task
+		accuracy = accuracy_score(y_true=p.label_ids.transpose()[0], y_pred = preds)
+		macro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='micro', zero_division=0)
+		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
+	
+	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
+	def compute_metrics_rank_classification_gpt2(p: EvalPrediction):
+		# logits = p.predictions.transpose([1, 0, 2])[0].transpose()[tokenized_labels].transpose()
+		logits = p.predictions
 		# preds = np.argmax(p.predictions, axis=1)
 		preds = tokenized_labels[np.argmax(logits, axis=1)]
-		print(p.label_ids.transpose()[0])
-		print(preds)
-		print()
 		# Compute macro and micro F1 for 5-class CaseHOLD task
 		accuracy = accuracy_score(y_true=p.label_ids.transpose()[0], y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='macro', zero_division=0)
@@ -377,36 +409,37 @@ def main():
 	def compute_metrics(p: EvalPrediction):
 		preds = np.argmax(p.predictions, axis=1)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
+		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
 		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1}
 	
-	def lmap(f, x): #(f: Callable, x: Iterable) -> List:
-		"""list(map(f, x))"""
-		return list(map(f, x))
+	# def lmap(f, x): #(f: Callable, x: Iterable) -> List:
+	# 	"""list(map(f, x))"""
+	# 	return list(map(f, x))
 
-	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
-		pred_ids = pred.predictions
-		label_ids = pred.label_ids
+	# def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
+	# 	pred_ids = pred.predictions
+	# 	label_ids = pred.label_ids
 
-		print('predictions')
-		print(pred.predictions)
-		print(pred_ids)
-		print(label_ids)
-		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
-		label_ids[label_ids == -100] = tokenizer.pad_token_id
-		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
-		pred_str = lmap(str.strip, pred_str)
-		label_str = lmap(str.strip, label_str)
-		print(pred_str)
-		print(label_str)
-		return pred_str, label_str
+	# 	print('predictions')
+	# 	print(pred.predictions)
+	# 	print(pred_ids)
+	# 	print(label_ids)
+	# 	pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
+	# 	label_ids[label_ids == -100] = tokenizer.pad_token_id
+	# 	label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
+	# 	pred_str = lmap(str.strip, pred_str)
+	# 	label_str = lmap(str.strip, label_str)
+	# 	print(pred_str)
+	# 	print(label_str)
+	# 	return pred_str, label_str
 	
-	def t5_metrics(pred: EvalPrediction):
-		# compute_t5_metrics
-		pred_str, label_str = decode_pred(pred)
-		metrics = compute_t5_metrics(pred_str, label_str)
-		return metrics
+	# def t5_metrics(pred: EvalPrediction):
+	# 	# compute_t5_metrics
+	# 	pred_str, label_str = decode_pred(pred)
+	# 	metrics = compute_t5_metrics(pred_str, label_str)
+	# 	return metrics
 
 	# def compute_t5_metrics(dataset, preds):
 	# 	print(dataset)
@@ -456,8 +489,8 @@ def main():
 			args=training_args,
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
-			data_collator=None,
-			compute_metrics=compute_metrics_rank_classification if config.model_type == 'gpt2' else compute_metrics,
+			data_collator=None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
+			compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
 			callbacks=[]
 		)
 
