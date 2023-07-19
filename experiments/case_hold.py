@@ -410,13 +410,16 @@ def main():
 	def compute_metrics_rank_classification_gpt2(p: EvalPrediction):
 		# logits = p.predictions.transpose([1, 0, 2])[0].transpose()[tokenized_labels].transpose()
 		logits = p.predictions
+		print('predictions')
 		# preds = np.argmax(p.predictions, axis=1)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
+		print(preds)
+		print(p.label_ids.squeeze())
 		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=p.label_ids.transpose()[0], y_pred = preds)
-		macro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=p.label_ids.transpose()[0], y_pred=preds, average='micro', zero_division=0)
+		accuracy = accuracy_score(y_true=p.label_ids.squeeze(), y_pred = preds)
+		macro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 	
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
