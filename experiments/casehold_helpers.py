@@ -51,6 +51,7 @@ if is_torch_available():
             self,
             tokenizer: PreTrainedTokenizer,
             task: str,
+            device,
             max_seq_length: Optional[int] = None,
             overwrite_cache=False,
             mode: Split = Split.train,
@@ -77,6 +78,7 @@ if is_torch_available():
                     max_seq_length,
                     tokenizer,
                     task,
+                    device,
                 )
 
         # NEED TO IMPLEMENT THESE CORRECTLY
@@ -97,6 +99,7 @@ if is_torch_available():
             self,
             tokenizer: PreTrainedTokenizer,
             task: str,
+            device,
             max_seq_length: Optional[int] = None,
             overwrite_cache=False,
             mode: Split = Split.train,
@@ -147,6 +150,7 @@ if is_torch_available():
                         max_seq_length,
                         tokenizer,
                         task,
+                        device,
                     )
                     logger.info("Saving features into cached file %s", cached_features_file)
                     torch.save(self.features, cached_features_file)
@@ -162,6 +166,7 @@ def convert_examples_to_text_to_text(
         max_length: int,
         tokenizer: PreTrainedTokenizer,
         task: str,
+        device,
         include_instruction: bool=False,
         prepare_decoder_input_ids_from_labels: bool=False,
 ):
@@ -221,10 +226,7 @@ def convert_examples_to_text_to_text(
         padding="max_length",
         truncation=True,
         return_tensors="pt",
-    )
-
-    print('model inputs')
-    print(model_inputs.device)
+    ).to(device)
 
     with tokenizer.as_target_tokenizer():
         tokenized_labels = tokenizer(
@@ -235,7 +237,7 @@ def convert_examples_to_text_to_text(
             return_tensors="pt",
             truncation=False,
             # pad_to_multiple_of=self.pad_to_multiple_of
-        )
+        ).to(device)
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
         # label_pad_token_id = -100
@@ -275,6 +277,7 @@ def convert_examples_to_features(
     max_length: int,
     tokenizer: PreTrainedTokenizer,
     task: str,
+    device,
 ) -> List[InputFeatures]:
     """
     Loads a data file into a list of `InputFeatures`
@@ -294,7 +297,7 @@ def convert_examples_to_features(
                     max_length=max_length,
                     padding="max_length",
                     truncation=True,
-                )
+                ).to(device)
 
                 choices_inputs.append(inputs)
         elif task == 'qnli':
@@ -307,7 +310,7 @@ def convert_examples_to_features(
                 max_length=max_length,
                 padding="max_length",
                 truncation=True,
-            )
+            ).to(device)
 
             choices_inputs.append(inputs)
         

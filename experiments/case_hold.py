@@ -220,7 +220,7 @@ def main():
             config=config,
             cache_dir=model_args.cache_dir,
 			# device_map = 'auto',
-        )
+        ).to(training_args.device)
 	# TODO: test this out
 	elif config.model_type == 'gpt2' or config.model_type == 'llama':
 		model = AutoModelForSequenceClassification.from_pretrained(
@@ -229,7 +229,7 @@ def main():
             config=config,
             cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
-		)
+		).to(training_args.device)
 	elif config.model_type != 'deberta':
 		model = AutoModelForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
@@ -237,7 +237,7 @@ def main():
 			config=config,
 			cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
-		)
+		).to(training_args.device)
 	else:
 		model = DebertaForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
@@ -245,7 +245,7 @@ def main():
 			config=config,
 			cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
-		)
+		).to(training_args.device)
 
 	print('device info')
 	print(model.device)
@@ -272,6 +272,7 @@ def main():
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
 					task=data_args.task_name,
+					device=training_args.device,
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
@@ -284,6 +285,7 @@ def main():
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
 					task=data_args.task_name,
+					device=training_args.device,
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
@@ -295,6 +297,7 @@ def main():
 				MultipleChoiceDataset(
 					tokenizer=tokenizer,
 					task=data_args.task_name,
+					device=training_args.device,
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
@@ -307,6 +310,7 @@ def main():
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
 					task=data_args.task_name,
+					device=training_args.device,
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.dev,
@@ -314,21 +318,23 @@ def main():
 					max_samples=data_args.max_eval_samples,
 				)
 		elif config.model_type == 'gpt2' or config.model_type == 'llama':
-				eval_dataset = \
-					T2TMultipleChoiceDataset(
-						tokenizer=tokenizer,
-						task=data_args.task_name,
-						max_seq_length=data_args.max_seq_length,
-						overwrite_cache=data_args.overwrite_cache,
-						mode=Split.dev,
-						text_to_text=True,
-						max_samples=data_args.max_eval_samples,
-					)
+			eval_dataset = \
+				T2TMultipleChoiceDataset(
+					tokenizer=tokenizer,
+					task=data_args.task_name,
+					device=training_args.device,
+					max_seq_length=data_args.max_seq_length,
+					overwrite_cache=data_args.overwrite_cache,
+					mode=Split.dev,
+					text_to_text=True,
+					max_samples=data_args.max_eval_samples,
+				)
 		else:
 			eval_dataset = \
 				MultipleChoiceDataset(
 					tokenizer=tokenizer,
 					task=data_args.task_name,
+					device=training_args.device,
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.dev,
@@ -340,6 +346,7 @@ def main():
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
 					task=data_args.task_name,
+					device=training_args.device,
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.test,
@@ -347,21 +354,23 @@ def main():
 					max_samples=data_args.max_predict_samples,
 				)
 		elif config.model_type == 'gpt2' or config.model_type == 'llama':
-				predict_dataset = \
-					T2TMultipleChoiceDataset(
-						tokenizer=tokenizer,
-						task=data_args.task_name,
-						max_seq_length=data_args.max_seq_length,
-						overwrite_cache=data_args.overwrite_cache,
-						mode=Split.test,
-						text_to_text=True,
-						max_samples=data_args.max_predict_samples,
-					)
+			predict_dataset = \
+				T2TMultipleChoiceDataset(
+					tokenizer=tokenizer,
+					task=data_args.task_name,
+					device=training_args.device,
+					max_seq_length=data_args.max_seq_length,
+					overwrite_cache=data_args.overwrite_cache,
+					mode=Split.test,
+					text_to_text=True,
+					max_samples=data_args.max_predict_samples,
+				)
 		else:
 			predict_dataset = \
 				MultipleChoiceDataset(
 					tokenizer=tokenizer,
 					task=data_args.task_name,
+					device=training_args.device,
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.test,
