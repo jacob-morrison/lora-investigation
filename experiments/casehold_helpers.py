@@ -226,7 +226,7 @@ def convert_examples_to_text_to_text(
         padding="max_length",
         truncation=True,
         return_tensors="pt",
-    ))
+    )
 
     with tokenizer.as_target_tokenizer():
         tokenized_labels = tokenizer(
@@ -237,7 +237,7 @@ def convert_examples_to_text_to_text(
             return_tensors="pt",
             truncation=False,
             # pad_to_multiple_of=self.pad_to_multiple_of
-        ))
+        )
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
         # label_pad_token_id = -100
@@ -297,7 +297,7 @@ def convert_examples_to_features(
                     max_length=max_length,
                     padding="max_length",
                     truncation=True,
-                ))
+                )
 
                 choices_inputs.append(inputs)
         elif task == 'qnli':
@@ -310,7 +310,7 @@ def convert_examples_to_features(
                 max_length=max_length,
                 padding="max_length",
                 truncation=True,
-            ))
+            )
 
             choices_inputs.append(inputs)
         
