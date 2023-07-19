@@ -67,37 +67,37 @@ experiments = [
 
 models = {
     'roberta-base': 1,
+    'roberta-large': 1,
 
     'microsoft/deberta-base': 1,
+    'microsoft/deberta-large': 1,
+
+    'microsoft/deberta-v2-xlarge': 2,
+    'microsoft/deberta-v2-xxlarge': 4,
 
     'microsoft/deberta-v3-xsmall': 1,
     'microsoft/deberta-v3-small': 1,
     'microsoft/deberta-v3-base': 1,
+    'microsoft/deberta-v3-large': 1,
 
     'gpt2': 1,
+    'gpt2-medium': 1,
+    'gpt2-large': 2,
+    'gpt2-xl': 4,
 
     'google/t5-v1_1-small': 1,
+    'google/t5-v1_1-base': 1,
+    'google/t5-v1_1-large': 2,
+    'google/t5-v1_1-xl': 4,
 
     'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-base-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-large-lora-experiments': 2,
+    'jacobmorrison/tk-instruct-xl-lora-experiments': 4,
 
+    'huggyllama/llama-7b': 8,
 
     # TODO: decide # of GPUs for these ones
-    'roberta-large': 1,
-    'microsoft/deberta-large': 1,
-    'microsoft/deberta-v2-xlarge': 1,
-    'microsoft/deberta-v2-xxlarge': 1,
-
-    'microsoft/deberta-v3-large': 1,
-    'gpt2-medium': 1,
-    'gpt2-large': 1,
-    'gpt2-xl': 1,
-    'huggyllama/llama-7b': 1,
-    'google/t5-v1_1-base': 1,
-    'google/t5-v1_1-large': 1,
-    'google/t5-v1_1-xl': 1,
-    'jacobmorrison/tk-instruct-base-lora-experiments': 1,
-    'jacobmorrison/tk-instruct-large-lora-experiments': 1,
-    'jacobmorrison/tk-instruct-xl-lora-experiments': 1,
 
     # Decide if we want to run these
     # 'huggyllama/llama-13b',
@@ -109,37 +109,35 @@ models = {
 
 LoRA_ranks = {
     'roberta-base': 1,
+    'roberta-large': 1,
 
     'microsoft/deberta-base': 1,
+    'microsoft/deberta-large': 1,
+
+    'microsoft/deberta-v2-xlarge': 1,
+    'microsoft/deberta-v2-xxlarge': 1,
 
     'microsoft/deberta-v3-xsmall': 1,
     'microsoft/deberta-v3-small': 1,
     'microsoft/deberta-v3-base': 1,
+    'microsoft/deberta-v3-large': 1,
 
     'gpt2': 3376,
+    'gpt2-medium': 3610,
+    'gpt2-large': 4200,
+    'gpt2-xl': 5071,
 
     'google/t5-v1_1-small': 1,
-
-    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
-
-
-    # TODO: decide # of GPUs for these ones
-    'roberta-large': 1,
-    'microsoft/deberta-large': 1,
-    'microsoft/deberta-v2-xlarge': 1,
-    'microsoft/deberta-v2-xxlarge': 1,
-
-    'microsoft/deberta-v3-large': 1,
-    'gpt2-medium': 3610,
-    'gpt2-large': 1,
-    'gpt2-xl': 1,
-    'huggyllama/llama-7b': 1,
     'google/t5-v1_1-base': 1,
     'google/t5-v1_1-large': 1,
     'google/t5-v1_1-xl': 1,
+
+    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
     'jacobmorrison/tk-instruct-base-lora-experiments': 1,
     'jacobmorrison/tk-instruct-large-lora-experiments': 1,
     'jacobmorrison/tk-instruct-xl-lora-experiments': 1,
+
+    'huggyllama/llama-7b': 1,
 
     # Decide if we want to run these
     # 'huggyllama/llama-13b',
