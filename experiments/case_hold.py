@@ -220,7 +220,7 @@ def main():
             config=config,
             cache_dir=model_args.cache_dir,
 			# device_map = 'auto',
-        ).to(training_args.device)
+        )
 	# TODO: test this out
 	elif config.model_type == 'gpt2' or config.model_type == 'llama':
 		model = AutoModelForSequenceClassification.from_pretrained(
@@ -229,7 +229,7 @@ def main():
             config=config,
             cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
-		).to(training_args.device)
+		)
 	elif config.model_type != 'deberta':
 		model = AutoModelForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
@@ -237,7 +237,7 @@ def main():
 			config=config,
 			cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
-		).to(training_args.device)
+		)
 	else:
 		model = DebertaForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
@@ -245,10 +245,7 @@ def main():
 			config=config,
 			cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
-		).to(training_args.device)
-
-	print('device info')
-	print(model.device)
+		)
 
     # resize embeddings if needed (e.g. for LlamaTokenizer)
 	embedding_size = model.get_input_embeddings().weight.shape[0]
@@ -508,6 +505,9 @@ def main():
 			compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
 			callbacks=[]
 		)
+
+	print('device info')
+	print(model.device)
 
 	# TODO: uncomment
 	# trainer.evaluate()
