@@ -213,6 +213,13 @@ def main():
 	# elif isinstance(tokenizer, GPT2Tokenizer) and isinstance(model, OPTForCausalLM):
 		# num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
 
+	sequence_classification_models = [
+		'gpt2',
+		'llama',
+		'deberta',
+		'deberta-v2'
+	]
+
 	if config.model_type == 't5':
 		model = AutoModelForSeq2SeqLM.from_pretrained(
             model_args.model_name_or_path,
@@ -222,7 +229,7 @@ def main():
 			# device_map = 'auto',
         )
 	# TODO: test this out
-	elif config.model_type == 'gpt2' or config.model_type == 'llama':
+	elif config.model_type in sequence_classification_models:
 		model = AutoModelForSequenceClassification.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -230,7 +237,7 @@ def main():
             cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
 		)
-	elif config.model_type != 'deberta' or True:
+	elif config.model_type != 'deberta':
 		model = AutoModelForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
 			from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -277,7 +284,7 @@ def main():
 					max_samples=data_args.max_train_samples,
 				)
 		# TODO: test this out
-		elif config.model_type == 'gpt2' or config.model_type == 'llama':
+		elif config.model_type in sequence_classification_models:
 			train_dataset = \
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
@@ -314,7 +321,7 @@ def main():
 					text_to_text=True,
 					max_samples=data_args.max_eval_samples,
 				)
-		elif config.model_type == 'gpt2' or config.model_type == 'llama':
+		elif config.model_type in sequence_classification_models:
 			eval_dataset = \
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
@@ -350,7 +357,7 @@ def main():
 					text_to_text=True,
 					max_samples=data_args.max_predict_samples,
 				)
-		elif config.model_type == 'gpt2' or config.model_type == 'llama':
+		elif config.model_type in sequence_classification_models:
 			predict_dataset = \
 				T2TMultipleChoiceDataset(
 					tokenizer=tokenizer,
