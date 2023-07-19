@@ -509,7 +509,7 @@ def main():
 			callbacks=[]
 		)
 
-	trainer.evaluate()
+	# trainer.evaluate()
 
 	# Training
 	if training_args.do_train:
