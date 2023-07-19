@@ -230,7 +230,7 @@ def main():
             cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
 		)
-	elif config.model_type != 'deberta':
+	elif config.model_type != 'deberta' or True:
 		model = AutoModelForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
 			from_tf=bool(".ckpt" in model_args.model_name_or_path),
