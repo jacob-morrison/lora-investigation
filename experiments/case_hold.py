@@ -39,7 +39,7 @@ from transformers.trainer_utils import is_main_process
 from transformers import EarlyStoppingCallback
 from casehold_helpers import MultipleChoiceDataset, Split, T2TMultipleChoiceDataset, MyDataCollatorForLanguageModeling
 from sklearn.metrics import f1_score, accuracy_score
-# from models.deberta import DebertaForMultipleChoice
+from models.deberta import DebertaForMultipleChoice
 from peft import PeftModel, PeftConfig, get_peft_config, get_peft_model, LoraConfig, TaskType
 import accelerate
 from compute_t5_metrics import compute_t5_metrics
