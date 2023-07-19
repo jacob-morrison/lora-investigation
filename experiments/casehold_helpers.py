@@ -63,23 +63,23 @@ if is_torch_available():
             elif task == 'qnli':
                 dataset = datasets.load_dataset('glue', task)
 
-            if text_to_text:
-                if mode == Split.dev:
-                    examples = dataset['validation']
-                elif mode == Split.test:
-                    examples = dataset['test']
-                elif mode == Split.train:
-                    examples = dataset['train']
-                logger.info("Training examples: %s", len(examples))
-                if max_samples is not None:
-                    examples = examples[:max_samples]
-                self.features = convert_examples_to_text_to_text(
-                    examples,
-                    max_seq_length,
-                    tokenizer,
-                    task,
-                    device,
-                )
+            if mode == Split.dev:
+                examples = dataset['validation']
+            elif mode == Split.test:
+                examples = dataset['test']
+            elif mode == Split.train:
+                examples = dataset['train']
+            logger.info("Training examples: %s", len(examples))
+            if max_samples is not None:
+                examples = examples[:max_samples]
+            self.features = convert_examples_to_text_to_text(
+                examples,
+                max_seq_length,
+                tokenizer,
+                task,
+                device,
+                text_to_text=text_to_text,
+            )
 
         # NEED TO IMPLEMENT THESE CORRECTLY
         def __len__(self):
@@ -169,6 +169,7 @@ def convert_examples_to_text_to_text(
         device,
         include_instruction: bool=False,
         prepare_decoder_input_ids_from_labels: bool=False,
+        text_to_text: bool=False,
 ):
     """
     Loads a data file into a text to text format
@@ -242,7 +243,10 @@ def convert_examples_to_text_to_text(
             if include_instruction:
                 pass
         processed_examples.append(processed_example)
-        labels_list.append([int(labels[ex_index])])
+        if text_to_text:
+            labels_list.append([int(labels[ex_index])])
+        else:
+            labels_list.append(torch.tensor(int(labels[ex_index])))
 
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
@@ -280,7 +284,6 @@ def convert_examples_to_text_to_text(
 
     outputs = []
 
-    print('printing gold labels')
     for input_ids, attention_mask, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs["labels"]):
         outputs.append({
             'input_ids': input_ids,

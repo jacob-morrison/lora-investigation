@@ -39,7 +39,6 @@ from transformers.trainer_utils import is_main_process
 from transformers import EarlyStoppingCallback
 from casehold_helpers import MultipleChoiceDataset, Split, T2TMultipleChoiceDataset, MyDataCollatorForLanguageModeling
 from sklearn.metrics import f1_score, accuracy_score
-from models.deberta import DebertaForMultipleChoice
 from peft import PeftModel, PeftConfig, get_peft_config, get_peft_model, LoraConfig, TaskType
 import accelerate
 from compute_t5_metrics import compute_t5_metrics
@@ -293,7 +292,7 @@ def main():
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.train,
-					text_to_text=True,
+					text_to_text=False,
 					max_samples=data_args.max_train_samples,
 				)
 		else:
@@ -330,7 +329,7 @@ def main():
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.dev,
-					text_to_text=True,
+					text_to_text=False,
 					max_samples=data_args.max_eval_samples,
 				)
 		else:
@@ -366,7 +365,7 @@ def main():
 					max_seq_length=data_args.max_seq_length,
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.test,
-					text_to_text=True,
+					text_to_text=False,
 					max_samples=data_args.max_predict_samples,
 				)
 		else:
@@ -560,17 +559,14 @@ def main():
 		trainer.log_metrics("predict", metrics)
 		trainer.save_metrics("predict", metrics)
 
-		print('preds')
-		print(predictions)
-		output_predict_file = os.path.join(training_args.output_dir, "test_predictions.csv")
-		if trainer.is_world_process_zero():
-			with open(output_predict_file, "w") as writer:
-				for index, pred_list in enumerate(predictions):
-					print(pred_list)
-					if len(pred_list.shape > 1):
-						pred_list = pred_list.squeeze()
-					pred_line = '\t'.join([f'{pred:.5f}' for pred in pred_list])
-					writer.write(f"{index}\t{pred_line}\n")
+		# output_predict_file = os.path.join(training_args.output_dir, "test_predictions.csv")
+		# if trainer.is_world_process_zero():
+		# 	with open(output_predict_file, "w") as writer:
+		# 		for index, pred_list in enumerate(predictions):
+		# 			if len(pred_list.shape) > 1:
+		# 				pred_list = pred_list.squeeze()
+		# 			pred_line = '\t'.join([f'{pred:.5f}' for pred in pred_list])
+		# 			writer.write(f"{index}\t{pred_line}\n")
 
 	# # Clean up checkpoints
 	# checkpoints = [filepath for filepath in glob.glob(f'{training_args.output_dir}/*/') if '/checkpoint' in filepath]
