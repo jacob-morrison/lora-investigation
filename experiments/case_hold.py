@@ -560,6 +560,8 @@ def main():
 			with open(output_predict_file, "w") as writer:
 				for index, pred_list in enumerate(predictions):
 					print(pred_list)
+					if len(pred_list.shape > 1):
+						pred_list = pred_list.squeeze()
 					pred_line = '\t'.join([f'{pred:.5f}' for pred in pred_list])
 					writer.write(f"{index}\t{pred_line}\n")
 
