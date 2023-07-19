@@ -68,10 +68,9 @@ experiments = [
 ]
 
 models = [
-    # 'bert-base-uncased',
-    # 'bert-large-uncased',
     # 'roberta-base',
     # 'roberta-large',
+    # 'microsoft/deberta-base'
     # 'microsoft/deberta-v2-xlarge',
     # 'microsoft/deberta-v2-xxlarge',
     # 'microsoft/deberta-v3-xsmall',
@@ -81,8 +80,13 @@ models = [
     # 'gpt2',
     # 'gpt2-medium',
     # 'gpt2-large',
-    'gpt2-xl',
+    # 'gpt2-xl',
     # 'huggyllama/llama-7b',
+    't5-small',
+    # 'jacobmorrison/tk-instruct-small-lora-experiments',
+    # 'jacobmorrison/tk-instruct-base-lora-experiments',
+    # 'jacobmorrison/tk-instruct-large-lora-experiments',
+    # 'jacobmorrison/tk-instruct-xl-lora-experiments',
 ]
 
 methods = [

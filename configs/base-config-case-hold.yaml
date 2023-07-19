@@ -4,14 +4,14 @@ tasks:
     image:
       beaker: ai2/pytorch1.13.0-cuda11.6-python3.9
     command: [bash, /gantry/entrypoint.sh]
-    arguments: [python, -u, experiments/case_hold.py, --task_name, case_hold, --model_name_or_path, $MODEL, --output_dir, /results/logs/case_hold/$MODEL/$METHOD/seed_$SEED, --do_train, --do_eval, --do_pred, --overwrite_output_dir, --use_lora, "$USE_LORA", --lora_rank, "$LORA_RANK", --load_best_model_at_end, --metric_for_best_model, micro-f1, --greater_is_better, "True", --evaluation_strategy, epoch, --save_strategy, epoch, --save_total_limit, "5", --num_train_epochs, "20", --learning_rate, "3e-5", --per_device_train_batch_size, "8", --per_device_eval_batch_size, "8", --seed, "$SEED", --fp16, --fp16_full_eval, --gradient_accumulation_steps, "1", --eval_accumulation_steps, "1"]
+    arguments: [python, -u, experiments/case_hold.py, --task_name, case_hold, --model_name_or_path, microsoft/deberta-base, --output_dir, /results/logs/case_hold/microsoft/deberta-base/seed_1, --do_train, --do_eval, --do_pred, --overwrite_output_dir, --use_lora, "False", --lora_rank, "8", --save_total_limit, "5", --load_best_model_at_end, --metric_for_best_model, micro-f1, --greater_is_better, "True", --evaluation_strategy, steps, --eval_steps, "125", --save_strategy, steps, --save_steps, "1250", --max_steps, "18750", --learning_rate, "5e-5", --per_device_train_batch_size, "8", --per_device_eval_batch_size, "8", --seed, "1", --gradient_accumulation_steps, "1", --eval_accumulation_steps, "1", --dataloader_pin_memory, "False"]
     envVars:
       - name: GANTRY_VERSION
         value: 0.17.0
       - name: GITHUB_REPO
-        value: jacob-morrison/lex-glue
+        value: jacob-morrison/lora-investigation
       - name: GIT_REF
-        value: caf7ffaa42c1cc2394bc5a9e69e52feac37a5bba
+        value: af0b5ace5dd59165b1db955dac76a3ea258821ba
       - name: PYTHON_VERSION
         value: "3.9"
       - name: PIP_REQUIREMENTS_FILE
@@ -19,7 +19,7 @@ tasks:
     datasets:
       - mountPath: /gantry
         source:
-          beaker: 01H52WTV54F58M4163MQZX92XW
+          beaker: 01H5B0SAY5E4KKEXX71RN079Q6
       - mountPath: /net/nfs.cirrascale
         source:
           hostPath: /net/nfs.cirrascale
@@ -30,4 +30,5 @@ tasks:
     context:
       priority: high
     constraints:
-      cluster: [ ai2/general-cirrascale, ai2/allennlp-cirrascale ]
+      cluster:
+        - ai2/allennlp-cirrascale
