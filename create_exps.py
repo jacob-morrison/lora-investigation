@@ -107,6 +107,48 @@ models = {
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments',
 }
 
+LoRA_ranks = {
+    'roberta-base': 1,
+
+    'microsoft/deberta-base': 1,
+
+    'microsoft/deberta-v3-xsmall': 1,
+    'microsoft/deberta-v3-small': 1,
+    'microsoft/deberta-v3-base': 1,
+
+    'gpt2': 3376,
+
+    'google/t5-v1_1-small': 1,
+
+    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+
+
+    # TODO: decide # of GPUs for these ones
+    'roberta-large': 1,
+    'microsoft/deberta-large': 1,
+    'microsoft/deberta-v2-xlarge': 1,
+    'microsoft/deberta-v2-xxlarge': 1,
+
+    'microsoft/deberta-v3-large': 1,
+    'gpt2-medium': 3610,
+    'gpt2-large': 1,
+    'gpt2-xl': 1,
+    'huggyllama/llama-7b': 1,
+    'google/t5-v1_1-base': 1,
+    'google/t5-v1_1-large': 1,
+    'google/t5-v1_1-xl': 1,
+    'jacobmorrison/tk-instruct-base-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-large-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-xl-lora-experiments': 1,
+
+    # Decide if we want to run these
+    # 'huggyllama/llama-13b',
+    # 'llama-2-7b,
+    # 'llama-2-13b,
+    # 'google/t5-v1_1-xxl',
+    # 'jacobmorrison/tk-instruct-xxl-lora-experiments',
+}
+
 methods = [
     'full_finetuning',
     # 'lora_1',
