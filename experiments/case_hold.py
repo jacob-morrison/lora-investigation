@@ -2,10 +2,11 @@
 # coding=utf-8
 """ Finetuning models on CaseHOLD (e.g. Bert, RoBERTa, LEGAL-BERT)."""
 
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-
 import logging
 import os
+
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+
 from dataclasses import dataclass, field
 from typing import Optional
 
