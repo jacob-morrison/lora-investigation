@@ -247,6 +247,10 @@ def main():
         	# device_map = 'auto',
 		)
 
+	print('device info')
+	print(tokenizer.device)
+	print(model.device)
+
     # resize embeddings if needed (e.g. for LlamaTokenizer)
 	embedding_size = model.get_input_embeddings().weight.shape[0]
 	if len(tokenizer) > embedding_size:
