@@ -61,10 +61,8 @@ encodings = {
 
 # ---- run all experiments ---- #
 experiments = [
-    # 'unfair-tos',
-    'eurlex',
-    # 'case-hold',
-    # 'ledgar',
+    'case-hold',
+    'qnli',
 ]
 
 models = {
@@ -110,26 +108,18 @@ models = {
 }
 
 methods = [
-    # 'full_finetuning',
+    'full_finetuning',
     # 'lora_1',
     'lora_2',
-    'lora_4',
-    'lora_8',
-    'lora_16',
-    'lora_32',
+    # 'lora_4',
+    # 'lora_8',
+    # 'lora_16',
+    # 'lora_32',
     # 'lora_64',
     # 'lora_128',
     # 'lora_256',
     # 'lora_512',
     # 'lora_1024',
-]
-
-seeds = [
-    1,
-    # 2,
-    # 3,
-    # 4,
-    # 5,
 ]
 
 for experiment in experiments:
@@ -140,8 +130,6 @@ for experiment in experiments:
     for seed in seeds:
         for model in models:
             for method in methods:
-                if 'llama' in model and method == 'full_finetuning':
-                    continue
                 d = copy.deepcopy(d1)
                 for i in range(len(d['tasks'][0]['arguments'])):
                     if '$MODEL' in d['tasks'][0]['arguments'][i]:
@@ -149,7 +137,7 @@ for experiment in experiments:
                     if '$METHOD' in d['tasks'][0]['arguments'][i]:
                         d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$METHOD', method)
                     if '$SEED' in d['tasks'][0]['arguments'][i]:
-                        d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$SEED', str(seed))
+                        d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$SEED', '1')
                     if '$LOWER' in d['tasks'][0]['arguments'][i]:
                         d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$LOWER', 'True' if 'uncased' in model else 'False')
                     if '$USE_LORA' in d['tasks'][0]['arguments'][i]:

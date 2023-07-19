@@ -19,7 +19,6 @@ import transformers
 from transformers import (
 	AutoConfig,
 	AutoModelForSeq2SeqLM,
-	AutoModelForCausalLM,
 	AutoModelForMultipleChoice,
 	AutoModelForSequenceClassification,
 	AutoTokenizer,
@@ -220,6 +219,7 @@ def main():
 	]
 
 	if config.model_type == 't5':
+		task_type = TaskType.SEQ_2_SEQ_LM
 		model = AutoModelForSeq2SeqLM.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -229,6 +229,7 @@ def main():
         )
 	# TODO: test this out
 	elif config.model_type in sequence_classification_models:
+		task_type = TaskType.SEQ_CLS
 		model = AutoModelForSequenceClassification.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -236,16 +237,10 @@ def main():
             cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
 		)
+	# TODO: I don't think this one will ever get hit, unless we use roberta?
 	elif config.model_type != 'deberta':
+		task_type = TaskType.SEQ_CLS
 		model = AutoModelForMultipleChoice.from_pretrained(
-			model_args.model_name_or_path,
-			from_tf=bool(".ckpt" in model_args.model_name_or_path),
-			config=config,
-			cache_dir=model_args.cache_dir,
-        	# device_map = 'auto',
-		)
-	else:
-		model = DebertaForMultipleChoice.from_pretrained(
 			model_args.model_name_or_path,
 			from_tf=bool(".ckpt" in model_args.model_name_or_path),
 			config=config,
@@ -260,7 +255,7 @@ def main():
 
 	if model_args.use_lora:
 		peft_config = LoraConfig(
-            task_type=TaskType.SEQ_CLS, inference_mode=False, r=model_args.lora_rank, lora_alpha=32, lora_dropout=0.1
+            task_type=task_type, inference_mode=False, r=model_args.lora_rank, lora_alpha=32, lora_dropout=0.1
         )
 		model = get_peft_model(model, peft_config)
 		model.print_trainable_parameters()
