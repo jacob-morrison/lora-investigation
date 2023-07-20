@@ -215,7 +215,7 @@ def main():
 		'gpt2',
 		'llama',
 		'deberta',
-		'deberta-v2',
+		# 'deberta-v2',
 		# 'roberta',
 	]
 
