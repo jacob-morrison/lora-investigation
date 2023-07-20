@@ -414,6 +414,7 @@ def main():
 		# logits = p.predictions.transpose([1, 0, 2])[0].transpose()[tokenized_labels].transpose()
 		logits = p.predictions
 		print('predictions')
+		print(logits)
 		# preds = np.argmax(p.predictions, axis=1)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
