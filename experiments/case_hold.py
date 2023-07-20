@@ -216,7 +216,7 @@ def main():
 		'llama',
 		'deberta',
 		'deberta-v2',
-		'roberta',
+		# 'roberta',
 	]
 
 	if config.model_type == 't5':
