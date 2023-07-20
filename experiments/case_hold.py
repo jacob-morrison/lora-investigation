@@ -228,7 +228,7 @@ def main():
             cache_dir=model_args.cache_dir,
 			# device_map = 'auto',
         )
-	# TODO: test this out
+	# TODO: test this out, it doesn't seem to be working
 	elif config.model_type in sequence_classification_models:
 		task_type = TaskType.SEQ_CLS
 		model = AutoModelForSequenceClassification.from_pretrained(
@@ -408,6 +408,7 @@ def main():
 		micro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 	
+	# TODO: check predictions
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification_gpt2(p: EvalPrediction):
 		# logits = p.predictions.transpose([1, 0, 2])[0].transpose()[tokenized_labels].transpose()
