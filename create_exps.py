@@ -108,14 +108,14 @@ models = {
 }
 
 LoRA_ranks = {
-    'roberta-base': 1,
-    'roberta-large': 1,
+    'roberta-base': 3398,
+    'roberta-large': 3626,
 
     'microsoft/deberta-base': 3776,
-    'microsoft/deberta-large': 1,
+    'microsoft/deberta-large': 4133,
 
-    'microsoft/deberta-v2-xlarge': 1,
-    'microsoft/deberta-v2-xxlarge': 1,
+    'microsoft/deberta-v2-xlarge': 6016,
+    'microsoft/deberta-v2-xxlarge': 5314,
 
     'microsoft/deberta-v3-xsmall': 1,
     'microsoft/deberta-v3-small': 1,
