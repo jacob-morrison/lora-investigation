@@ -57,6 +57,7 @@ if is_torch_available():
             mode: Split = Split.train,
             text_to_text: bool=False,
             max_samples: Optional[int] = None,
+            model_type: Optional[str]=None,
         ):
             if task == 'case_hold':
                 dataset = datasets.load_dataset('lex_glue', task)
@@ -170,6 +171,7 @@ def convert_examples_to_text_to_text(
         include_instruction: bool=False,
         prepare_decoder_input_ids_from_labels: bool=False,
         text_to_text: bool=False,
+        model_type: Optional[str]=None,
 ):
     """
     Loads a data file into a text to text format
@@ -227,24 +229,28 @@ def convert_examples_to_text_to_text(
     
     inputs = []
     processed_examples = []
+    input_endings = []
     labels_list = []
     for (ex_index, context) in tqdm.tqdm(enumerate(contexts), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(contexts)))
         if task == 'case_hold':
-            processed_example = context + '. '
+            processed_example = context + '.'
+            ending = ' '
             if include_instruction:
                 pass
 
             for choice, option in zip(choices, endings[ex_index]):
-                processed_example += choice + ' ' + option + ' '
+                ending += choice + ' ' + option + ' '
         elif task == 'qnli':
-            processed_example = context + '. ' + questions[ex_index] + ' '
+            processed_example = context + '.'
+            ending = ' ' + questions[ex_index] + ' '
             if include_instruction:
                 pass
         processed_examples.append(processed_example)
-        print(processed_example)
-        print(len(processed_example.split()))
+        input_endings.append(ending)
+        # print(processed_example)
+        # print(len(processed_example.split()))
         # label_list = list(range(len(choices)))
         if text_to_text:
             labels_list.append([int(labels[ex_index])])
@@ -260,6 +266,7 @@ def convert_examples_to_text_to_text(
     # print(processed_examples)
     model_inputs = tokenizer(
         processed_examples,
+        input_endings,
         add_special_tokens=True,
         max_length=max_length,
         padding="max_length",
