@@ -216,7 +216,7 @@ def main():
 		'llama',
 		'deberta',
 		# 'deberta-v2',
-		# 'roberta',
+		'roberta',
 	]
 
 	if config.model_type == 't5':
@@ -233,6 +233,7 @@ def main():
 		task_type = TaskType.SEQ_CLS
 		model = AutoModelForSequenceClassification.from_pretrained(
             model_args.model_name_or_path,
+			# num_labels=num_classes[data_args.task_name],
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
             cache_dir=model_args.cache_dir,
@@ -247,6 +248,7 @@ def main():
 			config=config,
 			cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
+			# num_labels=num_classes[data_args.task_name],
 		)
 
     # resize embeddings if needed (e.g. for LlamaTokenizer)
@@ -428,7 +430,11 @@ def main():
 	
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics(p: EvalPrediction):
+		print('predictions here!!')
+		print(p.predictions)
 		preds = np.argmax(p.predictions, axis=1)
+		print(preds)
+		print(p.label_ids)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
 		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
@@ -518,9 +524,15 @@ def main():
 
 	print('device info')
 	print(model.device)
+	logger.info("*** Evaluate ***")
 
-	# TODO: uncomment
-	trainer.evaluate()
+	metrics = trainer.evaluate()
+
+	max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
+	metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+
+	trainer.log_metrics("eval", metrics)
+	trainer.save_metrics("eval", metrics)
 
 	# Training
 	if training_args.do_train:

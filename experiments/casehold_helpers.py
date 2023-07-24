@@ -243,10 +243,17 @@ def convert_examples_to_text_to_text(
             if include_instruction:
                 pass
         processed_examples.append(processed_example)
+        print(processed_example)
+        print(len(processed_example.split()))
+        # label_list = list(range(len(choices)))
         if text_to_text:
             labels_list.append([int(labels[ex_index])])
+            # true_label = int(labels[ex_index])
+            # labels_list.append([1 if label == true_label else 0 for label in label_list])
         else:
             labels_list.append(torch.tensor(int(labels[ex_index])))
+            # true_label = int(labels[ex_index])
+            # labels_list.append([1 if label == true_label else 0 for label in label_list])
 
         # processed_examples.append(processed_example)
         # labels_list.append(choices[int(example['label'])])
@@ -284,12 +291,21 @@ def convert_examples_to_text_to_text(
 
     outputs = []
 
+    padded = 0
+
     for input_ids, attention_mask, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs["labels"]):
+        # print(input_ids.shape)
+        # print(attention_mask.shape)
+        # print()
+        if 0 in attention_mask:
+            padded += 1
         outputs.append({
             'input_ids': input_ids,
             'attention_mask': attention_mask,
             'labels': label,
         })
+    print('total: ' + str(len(model_inputs['input_ids'])))
+    print('padded: ' + str(padded))
 
     # print('model inputs')
     # print(model_inputs)
