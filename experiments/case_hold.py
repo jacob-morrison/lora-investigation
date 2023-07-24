@@ -524,20 +524,20 @@ def main():
 
 	print('device info')
 	print(model.device)
-	logger.info("*** Evaluate ***")
+	# logger.info("*** Evaluate ***")
 
-	metrics = trainer.evaluate()
+	# metrics = trainer.evaluate()
 
-	max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
-	metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+	# max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
+	# metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
 
-	trainer.log_metrics("eval", metrics)
-	trainer.save_metrics("eval", metrics)
+	# trainer.log_metrics("eval", metrics)
+	# trainer.save_metrics("eval", metrics)
 
 	# Training
 	if training_args.do_train:
 		trainer.train(
-			model_path=model_args.model_name_or_path if os.path.isdir(model_args.model_name_or_path) else None
+			# model_path=model_args.model_name_or_path if os.path.isdir(model_args.model_name_or_path) else None
 		)
 		trainer.save_model()
 		# # Re-save the tokenizer for model sharing
