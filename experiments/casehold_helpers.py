@@ -300,17 +300,31 @@ def convert_examples_to_text_to_text(
 
     padded = 0
 
-    for input_ids, attention_mask, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs["labels"]):
-        # print(input_ids.shape)
-        # print(attention_mask.shape)
-        # print()
-        if 0 in attention_mask:
-            padded += 1
-        outputs.append({
-            'input_ids': input_ids,
-            'attention_mask': attention_mask,
-            'labels': label,
-        })
+    if 'token_type_ids' in model_inputs:
+        for input_ids, attention_mask, token_type_ids, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs['token_type_ids'], model_inputs["labels"]):
+            # print(input_ids.shape)
+            # print(attention_mask.shape)
+            # print()
+            if 0 in attention_mask:
+                padded += 1
+            outputs.append({
+                'input_ids': input_ids,
+                'attention_mask': attention_mask,
+                'token_type_ids': token_type_ids,
+                'labels': label,
+            })
+    else:
+        for input_ids, attention_mask, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs["labels"]):
+            # print(input_ids.shape)
+            # print(attention_mask.shape)
+            # print()
+            if 0 in attention_mask:
+                padded += 1
+            outputs.append({
+                'input_ids': input_ids,
+                'attention_mask': attention_mask,
+                'labels': label,
+            })
     print('total: ' + str(len(model_inputs['input_ids'])))
     print('padded: ' + str(padded))
 
