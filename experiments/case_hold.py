@@ -403,8 +403,12 @@ def main():
 	def compute_metrics_rank_classification(p: EvalPrediction):
 		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose().shape)
 		logits = p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].transpose()
+		print('predictions')
+		print(logits)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
+		print(preds)
+		print(p.label_ids)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
 		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
 		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
