@@ -272,7 +272,7 @@ def convert_examples_to_text_to_text(
         add_special_tokens=True,
         max_length=max_length,
         padding="max_length",
-        truncation=False if mode == Split.train else True,
+        truncation=True,
         return_tensors="pt",
     )
 
@@ -309,8 +309,7 @@ def convert_examples_to_text_to_text(
             # print()
             if 0 in attention_mask:
                 padded += 1
-            if len(input_ids) > max_length:
-                print('skipping example')
+            elif mode == Split.train:
                 continue
             outputs.append({
                 'input_ids': input_ids,
@@ -325,8 +324,7 @@ def convert_examples_to_text_to_text(
             # print()
             if 0 in attention_mask:
                 padded += 1
-            if len(input_ids) > max_length:
-                print('skipping example')
+            elif mode == Split.train:
                 continue
             outputs.append({
                 'input_ids': input_ids,
