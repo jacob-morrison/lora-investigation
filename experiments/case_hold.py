@@ -408,11 +408,12 @@ def main():
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
 		print(preds)
-		print(p.label_ids)
+		true_labels = p.label_ids.squeeze()
+		print(true_labels)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
-		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
+		accuracy = accuracy_score(y_true=true_labels, y_pred = preds)
+		macro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 	
 	# TODO: check predictions
@@ -426,11 +427,12 @@ def main():
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
 		print(preds)
-		print(p.label_ids.squeeze())
+		true_labels = p.label_ids.squeeze()
+		print(true_labels)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=p.label_ids.squeeze(), y_pred = preds)
-		macro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='micro', zero_division=0)
+		accuracy = accuracy_score(y_true=true_labels, y_pred = preds)
+		macro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 	
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
@@ -439,12 +441,13 @@ def main():
 		print(p.predictions)
 		preds = np.argmax(p.predictions, axis=1)
 		print(preds)
-		print(p.label_ids)
+		true_labels = p.label_ids.squeeze()
+		print(true_labels)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
-		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
-		return {'macro-f1': macro_f1, 'micro-f1': micro_f1}
+		accuracy = accuracy_score(y_true=true_labels, y_pred = preds)
+		macro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='micro', zero_division=0)
+		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 	
 	# def lmap(f, x): #(f: Callable, x: Iterable) -> List:
 	# 	"""list(map(f, x))"""

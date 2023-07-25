@@ -80,6 +80,7 @@ if is_torch_available():
                 task,
                 device,
                 text_to_text=text_to_text,
+                mode=mode,
             )
 
         # NEED TO IMPLEMENT THESE CORRECTLY
@@ -172,6 +173,7 @@ def convert_examples_to_text_to_text(
         prepare_decoder_input_ids_from_labels: bool=False,
         text_to_text: bool=False,
         model_type: Optional[str]=None,
+        mode: Split = Split.train,
 ):
     """
     Loads a data file into a text to text format
@@ -270,7 +272,7 @@ def convert_examples_to_text_to_text(
         add_special_tokens=True,
         max_length=max_length,
         padding="max_length",
-        truncation=True,
+        truncation=False if mode == Split.train else True,
         return_tensors="pt",
     )
 
@@ -307,6 +309,9 @@ def convert_examples_to_text_to_text(
             # print()
             if 0 in attention_mask:
                 padded += 1
+            if len(input_ids) > max_length:
+                print('skipping example')
+                continue
             outputs.append({
                 'input_ids': input_ids,
                 'attention_mask': attention_mask,
@@ -320,6 +325,9 @@ def convert_examples_to_text_to_text(
             # print()
             if 0 in attention_mask:
                 padded += 1
+            if len(input_ids) > max_length:
+                print('skipping example')
+                continue
             outputs.append({
                 'input_ids': input_ids,
                 'attention_mask': attention_mask,
