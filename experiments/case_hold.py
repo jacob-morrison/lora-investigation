@@ -401,13 +401,14 @@ def main():
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification(p: EvalPrediction):
+		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose().shape)
 		logits = p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].transpose()
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=p.label_ids.squeeze(), y_pred = preds)
-		macro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=p.label_ids.squeeze(), y_pred=preds, average='micro', zero_division=0)
+		accuracy = accuracy_score(y_true=p.label_ids, y_pred = preds)
+		macro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='macro', zero_division=0)
+		micro_f1 = f1_score(y_true=p.label_ids, y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
 	
 	# TODO: check predictions
@@ -524,15 +525,15 @@ def main():
 
 	print('device info')
 	print(model.device)
-	# logger.info("*** Evaluate ***")
+	logger.info("*** Evaluate ***")
 
-	# metrics = trainer.evaluate()
+	metrics = trainer.evaluate()
 
-	# max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
-	# metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+	max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
+	metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
 
-	# trainer.log_metrics("eval", metrics)
-	# trainer.save_metrics("eval", metrics)
+	trainer.log_metrics("eval", metrics)
+	trainer.save_metrics("eval", metrics)
 
 	# Training
 	if training_args.do_train:
