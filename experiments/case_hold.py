@@ -214,7 +214,7 @@ def main():
 	sequence_classification_models = [
 		'gpt2',
 		'llama',
-		# 'deberta',
+		'deberta',
 		'deberta-v2',
 		'roberta',
 	]
