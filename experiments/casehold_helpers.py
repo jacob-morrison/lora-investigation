@@ -309,7 +309,7 @@ def convert_examples_to_text_to_text(
             # print()
             if 0 in attention_mask:
                 padded += 1
-            elif mode == Split.train or mode == Split.dev:
+            elif mode == Split.train:# or mode == Split.dev:
                 if mode == Split.train:
                     print('skipping train example')
                 else:
@@ -328,7 +328,7 @@ def convert_examples_to_text_to_text(
             # print()
             if 0 in attention_mask:
                 padded += 1
-            elif mode == Split.train or mode == Split.dev:
+            elif mode == Split.train:# or mode == Split.dev:
                 if mode == Split.train:
                     print('skipping train example')
                 else:
