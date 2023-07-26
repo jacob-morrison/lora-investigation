@@ -383,26 +383,32 @@ def main():
 	print(model_args)
 	print(train_dataset)
 
-	if config.model_type != 't5':
-		if training_args.do_train:
-			if data_args.max_train_samples is not None:
-				train_dataset = train_dataset[:data_args.max_train_samples]
-			# Log a few random samples from the training set:
-			for index in random.sample(range(len(train_dataset)), 3):
-				logger.info(f"Sample {index} of the training set: {train_dataset[index]}.")
+	# if config.model_type != 't5':
+	if training_args.do_train:
+		if data_args.max_train_samples is not None:
+			train_dataset = train_dataset[:data_args.max_train_samples]
+		# Log a few random samples from the training set:
+		for index in random.sample(range(len(train_dataset)), 3):
+			logger.info(f"Sample {index} of the training set: {train_dataset[index]}.")
 
-		if training_args.do_eval:
-			if data_args.max_eval_samples is not None:
-				eval_dataset = eval_dataset[:data_args.max_eval_samples]
+	if training_args.do_eval:
+		if data_args.max_eval_samples is not None:
+			eval_dataset = eval_dataset[:data_args.max_eval_samples]
 
-		if training_args.do_predict:
-			if data_args.max_predict_samples is not None:
-				predict_dataset = predict_dataset[:data_args.max_predict_samples]
+	if training_args.do_predict:
+		if data_args.max_predict_samples is not None:
+			predict_dataset = predict_dataset[:data_args.max_predict_samples]
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification(p: EvalPrediction):
+		print('lengths here')
+		print(len(p.predictions))
+		print(p.predictions[0].shape)
 		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose().shape)
+		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].shape)
 		logits = p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].transpose()
+		print(logits.shape)
+		print(np.argmax(logits, axis=1).shape)
 		print('predictions')
 		print(logits)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]

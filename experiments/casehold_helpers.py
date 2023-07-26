@@ -240,10 +240,11 @@ def convert_examples_to_text_to_text(
             processed_example = context + '.'
             ending = ' '
             if include_instruction:
-                pass
+                if task == 'case_hold':
+                    processed_example = 'What is the correct holding statement for the following text?\nText: ' + processed_example
 
             for choice, option in zip(choices, endings[ex_index]):
-                ending += choice + ' ' + option + ' '
+                ending += '\n' + choice + ': ' + option + ' '
         elif task == 'qnli':
             processed_example = context + '.'
             ending = ' ' + questions[ex_index] + ' '
