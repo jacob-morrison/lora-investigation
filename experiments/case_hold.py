@@ -18,6 +18,7 @@ import glob
 import transformers
 from transformers import (
 	AutoConfig,
+	AutoModelForCausalLM,
 	AutoModelForSeq2SeqLM,
 	AutoModelForMultipleChoice,
 	AutoModelForSequenceClassification,
@@ -212,12 +213,18 @@ def main():
 		# num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
 
 	sequence_classification_models = [
-		'gpt2',
-		'llama',
+		# 'gpt2',
+		# 'llama',
 		'deberta',
 		'deberta-v2',
 		'roberta',
 	]
+
+	causal_lms = [
+		'gpt2',
+		'llama',
+	]
+
 
 	if config.model_type == 't5':
 		task_type = TaskType.SEQ_2_SEQ_LM
@@ -240,6 +247,16 @@ def main():
         	# device_map = 'auto',
 		)
 	# TODO: I don't think this one will ever get hit, unless we use roberta?
+	elif config.model_type in causal_lms:
+		task_type = TaskType.CAUSAL_LM
+		model = AutoModelForCausalLM.from_pretrained(
+            model_args.model_name_or_path,
+			# num_labels=num_classes[data_args.task_name],
+            from_tf=bool(".ckpt" in model_args.model_name_or_path),
+            config=config,
+            cache_dir=model_args.cache_dir,
+        	# device_map = 'auto',
+		)
 	elif config.model_type != 'deberta':
 		task_type = TaskType.SEQ_CLS
 		model = AutoModelForMultipleChoice.from_pretrained(
@@ -564,7 +581,8 @@ def main():
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
 			data_collator=None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
-			compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
+			# compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
+			compute_metrics = compute_metrics_generation if config.model_type in causal_lms else compute_metrics,
 			callbacks=[]
 		)
 
