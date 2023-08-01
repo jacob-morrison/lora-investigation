@@ -385,8 +385,6 @@ def main():
 
 	# if config.model_type != 't5':
 	if training_args.do_train:
-		if data_args.max_train_samples is not None:
-			train_dataset = train_dataset[:data_args.max_train_samples]
 		# Log a few random samples from the training set:
 		for index in random.sample(range(len(train_dataset)), 3):
 			logger.info(f"Sample {index} of the training set: {train_dataset[index]}.")
@@ -398,6 +396,40 @@ def main():
 	if training_args.do_predict:
 		if data_args.max_predict_samples is not None:
 			predict_dataset = predict_dataset[:data_args.max_predict_samples]
+
+	def lmap(f, x): #(f: Callable, x: Iterable) -> List:
+		"""list(map(f, x))"""
+		return list(map(f, x))
+
+	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
+		pred_ids = pred.predictions
+		label_ids = pred.label_ids
+		print('predictions')
+		print(pred.predictions)
+		print(pred_ids)
+		print(label_ids)
+		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
+		label_ids[label_ids == -100] = tokenizer.pad_token_id
+		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
+		pred_str = lmap(str.strip, pred_str)
+		label_str = lmap(str.strip, label_str)
+		print(pred_str)
+		print(label_str)
+		print('done printing')
+		print()
+		return pred_str, label_str
+	
+	# need to fix label ids (give token ids, not 0-4)
+	def compute_metrics_generation(pred: EvalPrediction):
+		# compute_t5_metrics
+		print('debug prints')
+		print(pred.predictions)
+		print(pred.label_ids)
+		pred_str, label_str = decode_pred(pred)
+		print(pred_str)
+		print(label_str)
+		metrics = compute_t5_metrics(pred_str, label_str)
+		return metrics
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification(p: EvalPrediction):
@@ -522,7 +554,7 @@ def main():
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
 			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-			compute_metrics=compute_metrics_rank_classification,
+			compute_metrics=compute_metrics_generation, #compute_metrics_rank_classification,
 			callbacks=[]
 		)
 	else:

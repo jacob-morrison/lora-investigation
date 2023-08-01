@@ -184,11 +184,11 @@ def convert_examples_to_text_to_text(
 
     if task == 'case_hold':
         choices = [
-            '(A)',
-            '(B)',
-            '(C)',
-            '(D)',
-            '(E)',
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
         ]
         # label_map = {
         #     '(A)': 0,
@@ -244,7 +244,11 @@ def convert_examples_to_text_to_text(
                     processed_example = 'What is the correct holding statement for the following text?\nText: ' + processed_example
 
             for choice, option in zip(choices, endings[ex_index]):
-                ending += '\n' + choice + ': ' + option + ' '
+                ending += '\n(' + choice + '): ' + option + ' '
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
         elif task == 'qnli':
             processed_example = context + '.'
             ending = ' ' + questions[ex_index] + ' '
@@ -256,7 +260,8 @@ def convert_examples_to_text_to_text(
         # print(len(processed_example.split()))
         # label_list = list(range(len(choices)))
         if text_to_text:
-            labels_list.append([int(labels[ex_index])])
+            # labels_list.append([int(labels[ex_index])])
+            labels_list.append(choices[labels[ex_index]])
             # true_label = int(labels[ex_index])
             # labels_list.append([1 if label == true_label else 0 for label in label_list])
         else:
@@ -277,16 +282,18 @@ def convert_examples_to_text_to_text(
         return_tensors="pt",
     )
 
-    # with tokenizer.as_target_tokenizer():
-    #     tokenized_labels = tokenizer(
-    #         labels_list,
-    #         max_length=1, #max_length,
-    #         padding="max_length",
-    #         add_special_tokens=False,
-    #         return_tensors="pt",
-    #         truncation=False,
-    #         # pad_to_multiple_of=self.pad_to_multiple_of
-    #     )
+    if text_to_text:
+        with tokenizer.as_target_tokenizer():
+            labels_list = tokenizer(
+                labels_list,
+                max_length=1, #max_length,
+                padding="max_length",
+                add_special_tokens=False,
+                return_tensors="pt",
+                truncation=False,
+                # pad_to_multiple_of=self.pad_to_multiple_of
+            )['input_ids']
+
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
         # label_pad_token_id = -100

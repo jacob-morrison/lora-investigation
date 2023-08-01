@@ -64,6 +64,8 @@ def compute_t5_metrics(predictions, references, xlingual=False):
     assert len(predictions) == len(references), f"# of predictions {len(predictions)} doesn't match # of references {len(references)}."
     exact_match, f1 = 0., 0.
     for pred, gold in zip(predictions, references):
+        print('predictions here!!!')
+        print(pred)
         if isinstance(gold, str):
             gold = [gold]
         assert isinstance(gold, list)
