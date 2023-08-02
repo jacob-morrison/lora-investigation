@@ -689,8 +689,8 @@ def main():
 	# checkpoints = [filepath for filepath in glob.glob(f'{training_args.output_dir}/*/') if '/checkpoint' in filepath]
 	# for checkpoint in checkpoints:
 	# 	shutil.rmtree(checkpoint)
-
-	os.rename(training_args.output_dir + 'all_results.json', training_args.output_dir + 'metrics.json')
+	if is_main_process(training_args.local_rank):
+		os.rename(training_args.output_dir + 'all_results.json', training_args.output_dir + 'metrics.json')
 
 
 def _mp_fn(index):
