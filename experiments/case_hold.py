@@ -25,6 +25,7 @@ from transformers import (
 	AutoTokenizer,
 	DataCollatorForSeq2Seq,
 	# DataCollatorForLanguageModeling,
+	DataCollatorForLanguageModeling,
 	DefaultDataCollator,
 	EvalPrediction,
 	HfArgumentParser,
@@ -310,6 +311,18 @@ def main():
 					text_to_text=False,
 					max_samples=data_args.max_train_samples,
 				)
+		elif config.model_type in causal_lms:
+			train_dataset = \
+				T2TMultipleChoiceDataset(
+					tokenizer=tokenizer,
+					task=data_args.task_name,
+					device=training_args.device,
+					max_seq_length=data_args.max_seq_length,
+					overwrite_cache=data_args.overwrite_cache,
+					mode=Split.train,
+					text_to_text=True,
+					max_samples=data_args.max_train_samples,
+				)
 		else:
 			train_dataset = \
 				MultipleChoiceDataset(
@@ -347,6 +360,18 @@ def main():
 					text_to_text=False,
 					max_samples=data_args.max_eval_samples,
 				)
+		elif config.model_type in causal_lms:
+			eval_dataset = \
+				T2TMultipleChoiceDataset(
+					tokenizer=tokenizer,
+					task=data_args.task_name,
+					device=training_args.device,
+					max_seq_length=data_args.max_seq_length,
+					overwrite_cache=data_args.overwrite_cache,
+					mode=Split.dev,
+					text_to_text=True,
+					max_samples=data_args.max_eval_samples,
+				)
 		else:
 			eval_dataset = \
 				MultipleChoiceDataset(
@@ -381,6 +406,18 @@ def main():
 					overwrite_cache=data_args.overwrite_cache,
 					mode=Split.test,
 					text_to_text=False,
+					max_samples=data_args.max_predict_samples,
+				)
+		elif config.model_type in causal_lms:
+			predict_dataset = \
+				T2TMultipleChoiceDataset(
+					tokenizer=tokenizer,
+					task=data_args.task_name,
+					device=training_args.device,
+					max_seq_length=data_args.max_seq_length,
+					overwrite_cache=data_args.overwrite_cache,
+					mode=Split.test,
+					text_to_text=True,
 					max_samples=data_args.max_predict_samples,
 				)
 		else:
@@ -419,19 +456,25 @@ def main():
 		return list(map(f, x))
 
 	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
-		pred_ids = pred.predictions
+		if config.model_type in causal_lms:
+			# print(pred.predictions.shape)
+			# print(pred.predictions[0].shape)
+			# print(np.argmax(pred.predictions, axis=-1).transpose()[0].shape)
+			pred_ids = np.expand_dims(np.argmax(pred.predictions, axis=-1).transpose()[0], 1)
+		else:
+			pred_ids = pred.predictions
 		label_ids = pred.label_ids
 		print('predictions')
-		print(pred.predictions)
+		print(pred.inputs)
 		print(pred_ids)
 		print(label_ids)
-		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		label_ids[label_ids == -100] = tokenizer.pad_token_id
 		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
-		pred_str = lmap(str.strip, pred_str)
 		label_str = lmap(str.strip, label_str)
-		print(pred_str)
 		print(label_str)
+		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
+		pred_str = lmap(str.strip, pred_str)
+		print(pred_str)
 		print('done printing')
 		print()
 		return pred_str, label_str
@@ -439,12 +482,12 @@ def main():
 	# need to fix label ids (give token ids, not 0-4)
 	def compute_metrics_generation(pred: EvalPrediction):
 		# compute_t5_metrics
-		print('debug prints')
-		print(pred.predictions)
-		print(pred.label_ids)
+		# print('debug prints')
+		# print(pred.predictions)
+		# print(pred.label_ids)
 		pred_str, label_str = decode_pred(pred)
-		print(pred_str)
-		print(label_str)
+		# print(pred_str)
+		# print(label_str)
 		metrics = compute_t5_metrics(pred_str, label_str)
 		return metrics
 
@@ -580,7 +623,7 @@ def main():
 			args=training_args,
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
-			data_collator=None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
+			data_collator=MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type in causal_lms else None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
 			# compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
 			compute_metrics = compute_metrics_generation if config.model_type in causal_lms else compute_metrics,
 			callbacks=[]
