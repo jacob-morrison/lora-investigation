@@ -690,6 +690,8 @@ def main():
 	# for checkpoint in checkpoints:
 	# 	shutil.rmtree(checkpoint)
 
+	os.rename(training_args.output_dir + '/all_results.json', training_args.output_dir + '/metrics.json')
+
 
 def _mp_fn(index):
 	# For xla_spawn (TPUs)
