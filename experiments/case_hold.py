@@ -614,7 +614,7 @@ def main():
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
 			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-			compute_metrics=compute_metrics_generation, #compute_metrics_rank_classification,
+			compute_metrics=compute_metrics_rank_classification, #compute_metrics_generation, #compute_metrics_rank_classification,
 			callbacks=[]
 		)
 	else:
