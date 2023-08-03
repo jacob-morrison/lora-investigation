@@ -18,6 +18,7 @@ import glob
 import transformers
 from transformers import (
 	AutoConfig,
+	AutoModel,
 	AutoModelForCausalLM,
 	AutoModelForSeq2SeqLM,
 	AutoModelForMultipleChoice,
@@ -247,10 +248,9 @@ def main():
             cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
 		)
-	# TODO: I don't think this one will ever get hit, unless we use roberta?
 	elif config.model_type in causal_lms:
 		task_type = TaskType.CAUSAL_LM
-		model = AutoModelForCausalLM.from_pretrained(
+		model = AutoModel.from_pretrained(
             model_args.model_name_or_path,
 			# num_labels=num_classes[data_args.task_name],
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -322,6 +322,7 @@ def main():
 					mode=Split.train,
 					text_to_text=True,
 					max_samples=data_args.max_train_samples,
+	    			model_type=config.model_type,
 				)
 		else:
 			train_dataset = \
@@ -371,6 +372,7 @@ def main():
 					mode=Split.dev,
 					text_to_text=True,
 					max_samples=data_args.max_eval_samples,
+	    			model_type=config.model_type,
 				)
 		else:
 			eval_dataset = \
@@ -419,6 +421,7 @@ def main():
 					mode=Split.test,
 					text_to_text=True,
 					max_samples=data_args.max_predict_samples,
+	    			model_type=config.model_type,
 				)
 		else:
 			predict_dataset = \
@@ -481,6 +484,7 @@ def main():
 	
 	# need to fix label ids (give token ids, not 0-4)
 	def compute_metrics_generation(pred: EvalPrediction):
+		print('computing metrics for generation')
 		# compute_t5_metrics
 		# print('debug prints')
 		# print(pred.predictions)
@@ -623,7 +627,7 @@ def main():
 			args=training_args,
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
-			data_collator=MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type in causal_lms else None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
+			data_collator=None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type in causal_lms else None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
 			# compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
 			compute_metrics = compute_metrics_generation if config.model_type in causal_lms else compute_metrics,
 			callbacks=[]

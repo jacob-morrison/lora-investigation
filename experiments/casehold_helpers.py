@@ -13,9 +13,14 @@ from filelock import FileLock
 from transformers import PreTrainedTokenizer, is_tf_available, is_torch_available, PreTrainedTokenizerBase
 import datasets
 import torch
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
+causal_lms = [
+    'gpt2',
+    'llama',
+]
 
 @dataclass(frozen=True)
 class InputFeatures:
@@ -80,6 +85,7 @@ if is_torch_available():
                 task,
                 device,
                 text_to_text=text_to_text,
+                model_type=model_type,
                 mode=mode,
             )
 
@@ -308,11 +314,15 @@ def convert_examples_to_text_to_text(
 
     padded = 0
 
+
+    label_pad = np.array([-100] * 1023)
     if 'token_type_ids' in model_inputs:
         for input_ids, attention_mask, token_type_ids, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs['token_type_ids'], model_inputs["labels"]):
             # print(input_ids.shape)
             # print(attention_mask.shape)
             # print()
+            # if model_type in causal_lms:
+                # label = np.concatenate((label, label_pad))
             if 0 in attention_mask:
                 padded += 1
             elif mode == Split.train:# or mode == Split.dev:
@@ -332,6 +342,8 @@ def convert_examples_to_text_to_text(
             # print(input_ids.shape)
             # print(attention_mask.shape)
             # print()
+            # if model_type in causal_lms:
+                # label = np.concatenate((label, label_pad))
             if 0 in attention_mask:
                 padded += 1
             elif mode == Split.train:# or mode == Split.dev:
