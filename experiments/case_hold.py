@@ -222,32 +222,11 @@ def main():
 		't5',
 	]
 
-
-	# if config.model_type == 't5':
-	# 	task_type = TaskType.SEQ_2_SEQ_LM
-	# 	model = AutoModelForSeq2SeqLM.from_pretrained(
-    #         model_args.model_name_or_path,
-    #         from_tf=bool(".ckpt" in model_args.model_name_or_path),
-    #         config=config,
-    #         cache_dir=model_args.cache_dir,
-	# 		# device_map = 'auto',
-    #     )
-	# TODO: test this out, it doesn't seem to be working
-	#el
+	print('model type')
+	print(config.model_type)
 	if config.model_type in sequence_classification_models:
 		task_type = TaskType.SEQ_CLS
 		model = AutoModelForSequenceClassification.from_pretrained(
-            model_args.model_name_or_path,
-			# num_labels=num_classes[data_args.task_name],
-            from_tf=bool(".ckpt" in model_args.model_name_or_path),
-            config=config,
-            cache_dir=model_args.cache_dir,
-        	# device_map = 'auto',
-		)
-	# TODO: I don't think this one will ever get hit, unless we use roberta?
-	elif config.model_type in causal_lms:
-		task_type = TaskType.CAUSAL_LM
-		model = AutoModelForCausalLM.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -269,7 +248,6 @@ def main():
 	train_dataset = None
 	eval_dataset = None
 
-	# If do_train passed, train_dataset by default loads train split from file named train.csv in data directory
 	if training_args.do_train:
 		if config.model_type == 't5':
 			train_dataset = \
@@ -283,7 +261,6 @@ def main():
 					text_to_text=True,
 					max_samples=data_args.max_train_samples,
 				)
-		# TODO: test this out
 		elif config.model_type in sequence_classification_models:
 			train_dataset = \
 				T2TMultipleChoiceDataset(
@@ -297,15 +274,7 @@ def main():
 					max_samples=data_args.max_train_samples,
 				)
 		else:
-			train_dataset = \
-				MultipleChoiceDataset(
-					tokenizer=tokenizer,
-					task=data_args.task_name,
-					device=training_args.device,
-					max_seq_length=data_args.max_seq_length,
-					overwrite_cache=data_args.overwrite_cache,
-					mode=Split.train,
-				)
+			print('This is broken')
 
 	# If do_eval or do_predict passed, eval_dataset by default loads dev split from file named dev.csv in data directory
 	if training_args.do_eval:
@@ -334,15 +303,7 @@ def main():
 					max_samples=data_args.max_eval_samples,
 				)
 		else:
-			eval_dataset = \
-				MultipleChoiceDataset(
-					tokenizer=tokenizer,
-					task=data_args.task_name,
-					device=training_args.device,
-					max_seq_length=data_args.max_seq_length,
-					overwrite_cache=data_args.overwrite_cache,
-					mode=Split.dev,
-				)
+			print('This is broken')
 
 	if training_args.do_predict:
 		if config.model_type == 't5':
@@ -370,15 +331,7 @@ def main():
 					max_samples=data_args.max_predict_samples,
 				)
 		else:
-			predict_dataset = \
-				MultipleChoiceDataset(
-					tokenizer=tokenizer,
-					task=data_args.task_name,
-					device=training_args.device,
-					max_seq_length=data_args.max_seq_length,
-					overwrite_cache=data_args.overwrite_cache,
-					mode=Split.test,
-				)
+			print('This is broken')
 			
 	print('args')
 	print(data_args)
@@ -399,82 +352,16 @@ def main():
 	if training_args.do_predict:
 		if data_args.max_predict_samples is not None:
 			predict_dataset = predict_dataset[:data_args.max_predict_samples]
-
-	def lmap(f, x): #(f: Callable, x: Iterable) -> List:
-		"""list(map(f, x))"""
-		return list(map(f, x))
-
-	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
-		pred_ids = pred.predictions
-		label_ids = pred.label_ids
-		print('predictions')
-		print(pred.predictions)
-		print(pred_ids)
-		print(label_ids)
-		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
-		label_ids[label_ids == -100] = tokenizer.pad_token_id
-		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
-		pred_str = lmap(str.strip, pred_str)
-		label_str = lmap(str.strip, label_str)
-		print(pred_str)
-		print(label_str)
-		print('done printing')
-		print()
-		return pred_str, label_str
 	
-	# need to fix label ids (give token ids, not 0-4)
-	def compute_metrics_generation(pred: EvalPrediction):
-		# compute_t5_metrics
-		print('debug prints')
-		print(pred.predictions)
-		print(pred.label_ids)
-		pred_str, label_str = decode_pred(pred)
-		print(pred_str)
-		print(label_str)
-		metrics = compute_t5_metrics(pred_str, label_str)
-		return metrics
-
-	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
-	def compute_metrics_rank_classification(p: EvalPrediction):
-		print('tokenizes things here')
-		# print(len(p.predictions))
-		# print(p.predictions[0].shape)
-		print(tokenized_labels)
-		# print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose().shape)
-		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[0])
-		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[1])
-		for token in tokenized_labels:
-			print(token)
-			print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[token])
-		logits = p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].transpose()
-		print(logits)
-		print(np.argmax(logits, axis=1))
-		print(p.label_ids)
-		print()
-		# print(logits.shape)
-		# print(np.argmax(logits, axis=1).shape)
-		# print('predictions')
-		# print(logits)
-		# preds = tokenized_labels[np.argmax(logits, axis=1)]
-		preds = np.argmax(logits, axis=1)
-		# print(preds)
-		true_labels = p.label_ids.squeeze()
-		# print(true_labels)
-		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=true_labels, y_pred = preds)
-		macro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='micro', zero_division=0)
-		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
-	
-	# TODO: check predictions
-	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
-	def compute_metrics_rank_classification_gpt2(p: EvalPrediction):
+	def compute_metrics(p: EvalPrediction):
 		# logits = p.predictions.transpose([1, 0, 2])[0].transpose()[tokenized_labels].transpose()
-		logits = p.predictions[0]
+		if len(p.predictions) == 2:
+			logits = p.predictions[0]
+		else:
+			logits = p.predictions
 		# preds = np.argmax(p.predictions, axis=1)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		print('predictions')
-		print(logits)
 		preds = np.argmax(logits, axis=1)
 		print(preds)
 		true_labels = p.label_ids.squeeze()
@@ -484,79 +371,6 @@ def main():
 		macro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='macro', zero_division=0)
 		micro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='micro', zero_division=0)
 		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
-	
-	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
-	def compute_metrics(p: EvalPrediction):
-		print('predictions here!!')
-		print(p.predictions)
-		preds = np.argmax(p.predictions, axis=1)
-		print(preds)
-		true_labels = p.label_ids.squeeze()
-		print(true_labels)
-		# Compute macro and micro F1 for 5-class CaseHOLD task
-		accuracy = accuracy_score(y_true=true_labels, y_pred = preds)
-		macro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='macro', zero_division=0)
-		micro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='micro', zero_division=0)
-		return {'macro-f1': macro_f1, 'micro-f1': micro_f1, 'accuracy': accuracy}
-	
-	# def lmap(f, x): #(f: Callable, x: Iterable) -> List:
-	# 	"""list(map(f, x))"""
-	# 	return list(map(f, x))
-
-	# def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
-	# 	pred_ids = pred.predictions
-	# 	label_ids = pred.label_ids
-
-	# 	print('predictions')
-	# 	print(pred.predictions)
-	# 	print(pred_ids)
-	# 	print(label_ids)
-	# 	pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
-	# 	label_ids[label_ids == -100] = tokenizer.pad_token_id
-	# 	label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
-	# 	pred_str = lmap(str.strip, pred_str)
-	# 	label_str = lmap(str.strip, label_str)
-	# 	print(pred_str)
-	# 	print(label_str)
-	# 	return pred_str, label_str
-	
-	# def t5_metrics(pred: EvalPrediction):
-	# 	# compute_t5_metrics
-	# 	pred_str, label_str = decode_pred(pred)
-	# 	metrics = compute_t5_metrics(pred_str, label_str)
-	# 	return metrics
-
-	# def compute_t5_metrics(dataset, preds):
-	# 	print(dataset)
-	# 	print(preds)
-	# 	decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-	# 	references = [e["Instance"]["labels"] for e in dataset]
-	# 	result = compute_t5_metrics(predictions=decoded_preds, references=references)
-	# 	prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
-	# 	result["gen_len"] = np.mean(prediction_lens)
-	# 	result = {k: round(v, 4) for k, v in result.items()}
-	# 	return result
-
-	label_map = {
-		'case_hold': ['A', 'B', 'C', 'D', 'E',],
-		'qnli': ['true', 'false'],
-	}
-
-	with tokenizer.as_target_tokenizer():
-		tokenized_labels = tokenizer(
-            label_map[data_args.task_name],
-            max_length=1, #max_length,
-            padding="max_length",
-            add_special_tokens=False,
-            return_tensors="pt",
-            truncation=False,
-            # pad_to_multiple_of=self.pad_to_multiple_of
-        )
-	tokenized_labels = tokenized_labels.input_ids.squeeze(1).numpy()
-	sorted_tokenized_labels = np.sort(tokenized_labels)
-
-	print('label list here!!!!')
-	print(tokenized_labels)
 
 	# Initialize our Trainer
 	if config.model_type == 't5':
@@ -565,8 +379,8 @@ def main():
 			args=training_args,
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
-			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-			compute_metrics=compute_metrics_rank_classification_gpt2, #compute_metrics_generation, #compute_metrics_rank_classification,
+			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model),
+			compute_metrics=compute_metrics,
 			callbacks=[]
 		)
 	else:
@@ -575,9 +389,8 @@ def main():
 			args=training_args,
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
-			data_collator=None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
-			# compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
-			compute_metrics = compute_metrics_generation if config.model_type in causal_lms else compute_metrics,
+			data_collator=None,
+			compute_metrics=compute_metrics,
 			callbacks=[]
 		)
 
@@ -643,12 +456,6 @@ def main():
 	# 	shutil.rmtree(checkpoint)
 	if is_main_process(training_args.local_rank):
 		os.rename(training_args.output_dir + 'all_results.json', training_args.output_dir + 'metrics.json')
-
-
-def _mp_fn(index):
-	# For xla_spawn (TPUs)
-	main()
-
 
 if __name__ == "__main__":
 	main()
