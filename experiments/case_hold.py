@@ -362,6 +362,7 @@ def main():
 		# preds = np.argmax(p.predictions, axis=1)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		print('predictions')
+		print(logits)
 		preds = np.argmax(logits, axis=1)
 		print(preds)
 		true_labels = p.label_ids.squeeze()
