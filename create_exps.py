@@ -182,6 +182,15 @@ for experiment in experiments:
     for seed in seeds:
         for model in models:
             for method in methods:
+                # Set environment variables:
+                    # Model
+                    # Size?
+                    # LoRA vs full finetuning
+                    # LoRA Rank (-1 if not using LoRA)
+                    # Seed
+                    # Learning Rate
+                    # Task
+
                 d = copy.deepcopy(d1)
                 for i in range(len(d['tasks'][0]['arguments'])):
                     if '$MODEL' in d['tasks'][0]['arguments'][i]:

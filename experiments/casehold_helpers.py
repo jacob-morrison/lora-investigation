@@ -13,14 +13,9 @@ from filelock import FileLock
 from transformers import PreTrainedTokenizer, is_tf_available, is_torch_available, PreTrainedTokenizerBase
 import datasets
 import torch
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
-causal_lms = [
-    'gpt2',
-    'llama',
-]
 
 @dataclass(frozen=True)
 class InputFeatures:
@@ -85,7 +80,6 @@ if is_torch_available():
                 task,
                 device,
                 text_to_text=text_to_text,
-                model_type=model_type,
                 mode=mode,
             )
 
@@ -266,8 +260,10 @@ def convert_examples_to_text_to_text(
         # print(len(processed_example.split()))
         # label_list = list(range(len(choices)))
         if text_to_text:
-            # labels_list.append([int(labels[ex_index])])
-            labels_list.append(choices[labels[ex_index]])
+            labels_list.append([int(labels[ex_index])])
+            # labels_list.append(choices[labels[ex_index]])
+            # true_label = int(labels[ex_index])
+            # labels_list.append([1 if label == true_label else 0 for label in label_list])
         else:
             labels_list.append(torch.tensor(int(labels[ex_index])))
             # true_label = int(labels[ex_index])
@@ -286,17 +282,17 @@ def convert_examples_to_text_to_text(
         return_tensors="pt",
     )
 
-    if text_to_text:
-        with tokenizer.as_target_tokenizer():
-            labels_list = tokenizer(
-                labels_list,
-                max_length=max_length,
-                padding="max_length",
-                add_special_tokens=False,
-                return_tensors="pt",
-                truncation=False,
-                # pad_to_multiple_of=self.pad_to_multiple_of
-            )['input_ids']
+    # if text_to_text:
+    #     with tokenizer.as_target_tokenizer():
+    #         labels_list = tokenizer(
+    #             labels_list,
+    #             max_length=1, #max_length,
+    #             padding="max_length",
+    #             add_special_tokens=False,
+    #             return_tensors="pt",
+    #             truncation=False,
+    #             # pad_to_multiple_of=self.pad_to_multiple_of
+    #         )['input_ids']
 
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
@@ -314,15 +310,11 @@ def convert_examples_to_text_to_text(
 
     padded = 0
 
-
-    # label_pad = np.array([-100] * 1023)
     if 'token_type_ids' in model_inputs:
         for input_ids, attention_mask, token_type_ids, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs['token_type_ids'], model_inputs["labels"]):
             # print(input_ids.shape)
             # print(attention_mask.shape)
             # print()
-            # if model_type in causal_lms:
-                # label = np.concatenate((label, label_pad))
             if 0 in attention_mask:
                 padded += 1
             elif mode == Split.train:# or mode == Split.dev:
@@ -342,8 +334,6 @@ def convert_examples_to_text_to_text(
             # print(input_ids.shape)
             # print(attention_mask.shape)
             # print()
-            # if model_type in causal_lms:
-                # label = np.concatenate((label, label_pad))
             if 0 in attention_mask:
                 padded += 1
             elif mode == Split.train:# or mode == Split.dev:
@@ -527,3 +517,36 @@ class MyDataCollatorForLanguageModeling(DataCollatorMixin):
                 labels[labels == self.tokenizer.pad_token_id] = -100
             batch["labels"] = labels
         return batch
+
+    def torch_mask_tokens(self, inputs: Any, special_tokens_mask: Optional[Any] = None) -> Tuple[Any, Any]:
+        """
+        Prepare masked tokens inputs/labels for masked language modeling: 80% MASK, 10% random, 10% original.
+        """
+        import torch
+
+        labels = inputs.clone()
+        # We sample a few tokens in each sequence for MLM training (with probability `self.mlm_probability`)
+        probability_matrix = torch.full(labels.shape, self.mlm_probability)
+        if special_tokens_mask is None:
+            special_tokens_mask = [
+                self.tokenizer.get_special_tokens_mask(val, already_has_special_tokens=True) for val in labels.tolist()
+            ]
+            special_tokens_mask = torch.tensor(special_tokens_mask, dtype=torch.bool)
+        else:
+            special_tokens_mask = special_tokens_mask.bool()
+
+        probability_matrix.masked_fill_(special_tokens_mask, value=0.0)
+        masked_indices = torch.bernoulli(probability_matrix).bool()
+        labels[~masked_indices] = -100  # We only compute loss on masked tokens
+
+        # 80% of the time, we replace masked input tokens with tokenizer.mask_token ([MASK])
+        indices_replaced = torch.bernoulli(torch.full(labels.shape, 0.8)).bool() & masked_indices
+        inputs[indices_replaced] = self.tokenizer.convert_tokens_to_ids(self.tokenizer.mask_token)
+
+        # 10% of the time, we replace masked input tokens with random word
+        indices_random = torch.bernoulli(torch.full(labels.shape, 0.5)).bool() & masked_indices & ~indices_replaced
+        random_words = torch.randint(len(self.tokenizer), labels.shape, dtype=torch.long)
+        inputs[indices_random] = random_words[indices_random]
+
+        # The rest of the time (10% of the time) we keep the masked input tokens unchanged
+        return inputs, labels

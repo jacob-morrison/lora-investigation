@@ -18,7 +18,6 @@ import glob
 import transformers
 from transformers import (
 	AutoConfig,
-	AutoModel,
 	AutoModelForCausalLM,
 	AutoModelForSeq2SeqLM,
 	AutoModelForMultipleChoice,
@@ -26,7 +25,6 @@ from transformers import (
 	AutoTokenizer,
 	DataCollatorForSeq2Seq,
 	# DataCollatorForLanguageModeling,
-	DataCollatorForLanguageModeling,
 	DefaultDataCollator,
 	EvalPrediction,
 	HfArgumentParser,
@@ -35,6 +33,7 @@ from transformers import (
 	TrainingArguments,
 	Seq2SeqTrainer,
 	Seq2SeqTrainingArguments,
+	T5ForSequenceClassification,
 	set_seed,
 )
 from transformers.trainer_utils import is_main_process
@@ -215,30 +214,27 @@ def main():
 		# num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
 
 	sequence_classification_models = [
-		# 'gpt2',
-		# 'llama',
+		'gpt2',
+		'llama',
 		'deberta',
 		'deberta-v2',
 		'roberta',
-	]
-
-	causal_lms = [
-		'gpt2',
-		'llama',
+		't5',
 	]
 
 
-	if config.model_type == 't5':
-		task_type = TaskType.SEQ_2_SEQ_LM
-		model = AutoModelForSeq2SeqLM.from_pretrained(
-            model_args.model_name_or_path,
-            from_tf=bool(".ckpt" in model_args.model_name_or_path),
-            config=config,
-            cache_dir=model_args.cache_dir,
-			# device_map = 'auto',
-        )
+	# if config.model_type == 't5':
+	# 	task_type = TaskType.SEQ_2_SEQ_LM
+	# 	model = AutoModelForSeq2SeqLM.from_pretrained(
+    #         model_args.model_name_or_path,
+    #         from_tf=bool(".ckpt" in model_args.model_name_or_path),
+    #         config=config,
+    #         cache_dir=model_args.cache_dir,
+	# 		# device_map = 'auto',
+    #     )
 	# TODO: test this out, it doesn't seem to be working
-	elif config.model_type in sequence_classification_models:
+	#el
+	if config.model_type in sequence_classification_models:
 		task_type = TaskType.SEQ_CLS
 		model = AutoModelForSequenceClassification.from_pretrained(
             model_args.model_name_or_path,
@@ -248,25 +244,14 @@ def main():
             cache_dir=model_args.cache_dir,
         	# device_map = 'auto',
 		)
+	# TODO: I don't think this one will ever get hit, unless we use roberta?
 	elif config.model_type in causal_lms:
 		task_type = TaskType.CAUSAL_LM
-		model = AutoModel.from_pretrained(
+		model = AutoModelForCausalLM.from_pretrained(
             model_args.model_name_or_path,
-			# num_labels=num_classes[data_args.task_name],
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
             cache_dir=model_args.cache_dir,
-        	# device_map = 'auto',
-		)
-	elif config.model_type != 'deberta':
-		task_type = TaskType.SEQ_CLS
-		model = AutoModelForMultipleChoice.from_pretrained(
-			model_args.model_name_or_path,
-			from_tf=bool(".ckpt" in model_args.model_name_or_path),
-			config=config,
-			cache_dir=model_args.cache_dir,
-        	# device_map = 'auto',
-			# num_labels=num_classes[data_args.task_name],
 		)
 
     # resize embeddings if needed (e.g. for LlamaTokenizer)
@@ -311,19 +296,6 @@ def main():
 					text_to_text=False,
 					max_samples=data_args.max_train_samples,
 				)
-		elif config.model_type in causal_lms:
-			train_dataset = \
-				T2TMultipleChoiceDataset(
-					tokenizer=tokenizer,
-					task=data_args.task_name,
-					device=training_args.device,
-					max_seq_length=data_args.max_seq_length,
-					overwrite_cache=data_args.overwrite_cache,
-					mode=Split.train,
-					text_to_text=True,
-					max_samples=data_args.max_train_samples,
-	    			model_type=config.model_type,
-				)
 		else:
 			train_dataset = \
 				MultipleChoiceDataset(
@@ -361,19 +333,6 @@ def main():
 					text_to_text=False,
 					max_samples=data_args.max_eval_samples,
 				)
-		elif config.model_type in causal_lms:
-			eval_dataset = \
-				T2TMultipleChoiceDataset(
-					tokenizer=tokenizer,
-					task=data_args.task_name,
-					device=training_args.device,
-					max_seq_length=data_args.max_seq_length,
-					overwrite_cache=data_args.overwrite_cache,
-					mode=Split.dev,
-					text_to_text=True,
-					max_samples=data_args.max_eval_samples,
-	    			model_type=config.model_type,
-				)
 		else:
 			eval_dataset = \
 				MultipleChoiceDataset(
@@ -409,19 +368,6 @@ def main():
 					mode=Split.test,
 					text_to_text=False,
 					max_samples=data_args.max_predict_samples,
-				)
-		elif config.model_type in causal_lms:
-			predict_dataset = \
-				T2TMultipleChoiceDataset(
-					tokenizer=tokenizer,
-					task=data_args.task_name,
-					device=training_args.device,
-					max_seq_length=data_args.max_seq_length,
-					overwrite_cache=data_args.overwrite_cache,
-					mode=Split.test,
-					text_to_text=True,
-					max_samples=data_args.max_predict_samples,
-	    			model_type=config.model_type,
 				)
 		else:
 			predict_dataset = \
@@ -459,59 +405,61 @@ def main():
 		return list(map(f, x))
 
 	def decode_pred(pred: EvalPrediction):# -> Tuple[List[str], List[str]]:
-		if config.model_type in causal_lms:
-			# print(pred.predictions.shape)
-			# print(pred.predictions[0].shape)
-			# print(np.argmax(pred.predictions, axis=-1).transpose()[0].shape)
-			pred_ids = np.expand_dims(np.argmax(pred.predictions, axis=-1).transpose()[0], 1)
-		else:
-			pred_ids = pred.predictions
+		pred_ids = pred.predictions
 		label_ids = pred.label_ids
-		# print('predictions')
-		# print(pred.inputs)
-		# print(pred_ids)
-		# print(label_ids)
+		print('predictions')
+		print(pred.predictions)
+		print(pred_ids)
+		print(label_ids)
+		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		label_ids[label_ids == -100] = tokenizer.pad_token_id
 		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
-		label_str = lmap(str.strip, label_str)
-		# print(label_str)
-		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		pred_str = lmap(str.strip, pred_str)
-		# print(pred_str)
-		# print('done printing')
-		# print()
+		label_str = lmap(str.strip, label_str)
+		print(pred_str)
+		print(label_str)
+		print('done printing')
+		print()
 		return pred_str, label_str
 	
 	# need to fix label ids (give token ids, not 0-4)
 	def compute_metrics_generation(pred: EvalPrediction):
-		# print('computing metrics for generation')
 		# compute_t5_metrics
-		# print('debug prints')
-		# print(pred.predictions)
-		# print(pred.label_ids)
+		print('debug prints')
+		print(pred.predictions)
+		print(pred.label_ids)
 		pred_str, label_str = decode_pred(pred)
-		# print(pred_str)
-		# print(label_str)
+		print(pred_str)
+		print(label_str)
 		metrics = compute_t5_metrics(pred_str, label_str)
 		return metrics
 
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification(p: EvalPrediction):
-		print('lengths here')
-		print(len(p.predictions))
-		print(p.predictions[0].shape)
-		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose().shape)
-		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].shape)
+		print('tokenizes things here')
+		# print(len(p.predictions))
+		# print(p.predictions[0].shape)
+		print(tokenized_labels)
+		# print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose().shape)
+		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[0])
+		print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[1])
+		for token in tokenized_labels:
+			print(token)
+			print(p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[token])
 		logits = p.predictions[0].transpose([1, 0, 2]).squeeze().transpose()[tokenized_labels].transpose()
-		print(logits.shape)
-		print(np.argmax(logits, axis=1).shape)
-		print('predictions')
 		print(logits)
+		print(np.argmax(logits, axis=1))
+		print(p.label_ids)
+		print()
+		# print(logits.shape)
+		# print(np.argmax(logits, axis=1).shape)
+		# print('predictions')
+		# print(logits)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
 		preds = np.argmax(logits, axis=1)
-		print(preds)
+		# print(preds)
 		true_labels = p.label_ids.squeeze()
-		print(true_labels)
+		# print(true_labels)
 		# Compute macro and micro F1 for 5-class CaseHOLD task
 		accuracy = accuracy_score(y_true=true_labels, y_pred = preds)
 		macro_f1 = f1_score(y_true=true_labels, y_pred=preds, average='macro', zero_division=0)
@@ -522,11 +470,11 @@ def main():
 	# Define custom compute_metrics function, returns macro F1 metric for CaseHOLD task
 	def compute_metrics_rank_classification_gpt2(p: EvalPrediction):
 		# logits = p.predictions.transpose([1, 0, 2])[0].transpose()[tokenized_labels].transpose()
-		logits = p.predictions
-		print('predictions')
-		print(logits)
+		logits = p.predictions[0]
 		# preds = np.argmax(p.predictions, axis=1)
 		# preds = tokenized_labels[np.argmax(logits, axis=1)]
+		print('predictions')
+		print(logits)
 		preds = np.argmax(logits, axis=1)
 		print(preds)
 		true_labels = p.label_ids.squeeze()
@@ -618,7 +566,7 @@ def main():
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
 			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-			compute_metrics=compute_metrics_generation, #compute_metrics_rank_classification,
+			compute_metrics=compute_metrics_rank_classification_gpt2, #compute_metrics_generation, #compute_metrics_rank_classification,
 			callbacks=[]
 		)
 	else:
@@ -627,7 +575,7 @@ def main():
 			args=training_args,
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
-			data_collator=None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type in causal_lms else None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
+			data_collator=None, #MyDataCollatorForLanguageModeling(tokenizer, mlm=False) if config.model_type == 'gpt2' or config.model_type == 'llama' else None,
 			# compute_metrics=compute_metrics_rank_classification_gpt2 if config.model_type == 'gpt2' or config.model_type == 'llama' else compute_metrics,
 			compute_metrics = compute_metrics_generation if config.model_type in causal_lms else compute_metrics,
 			callbacks=[]
