@@ -467,24 +467,24 @@ def main():
 		else:
 			pred_ids = pred.predictions
 		label_ids = pred.label_ids
-		print('predictions')
-		print(pred.inputs)
-		print(pred_ids)
-		print(label_ids)
+		# print('predictions')
+		# print(pred.inputs)
+		# print(pred_ids)
+		# print(label_ids)
 		label_ids[label_ids == -100] = tokenizer.pad_token_id
 		label_str = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
 		label_str = lmap(str.strip, label_str)
-		print(label_str)
+		# print(label_str)
 		pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
 		pred_str = lmap(str.strip, pred_str)
-		print(pred_str)
-		print('done printing')
-		print()
+		# print(pred_str)
+		# print('done printing')
+		# print()
 		return pred_str, label_str
 	
 	# need to fix label ids (give token ids, not 0-4)
 	def compute_metrics_generation(pred: EvalPrediction):
-		print('computing metrics for generation')
+		# print('computing metrics for generation')
 		# compute_t5_metrics
 		# print('debug prints')
 		# print(pred.predictions)
@@ -618,7 +618,7 @@ def main():
 			train_dataset=train_dataset,
 			eval_dataset=eval_dataset,
 			data_collator=DataCollatorForSeq2Seq(tokenizer, model=model) if config.model_type == 't5' else None,
-			compute_metrics=compute_metrics_rank_classification, #compute_metrics_generation, #compute_metrics_rank_classification,
+			compute_metrics=compute_metrics_generation, #compute_metrics_rank_classification,
 			callbacks=[]
 		)
 	else:

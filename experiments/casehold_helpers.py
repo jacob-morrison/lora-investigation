@@ -266,8 +266,8 @@ def convert_examples_to_text_to_text(
         # print(len(processed_example.split()))
         # label_list = list(range(len(choices)))
         if text_to_text:
-            labels_list.append([int(labels[ex_index])])
-            # labels_list.append(choices[labels[ex_index]])
+            # labels_list.append([int(labels[ex_index])])
+            labels_list.append(choices[labels[ex_index]])
         else:
             labels_list.append(torch.tensor(int(labels[ex_index])))
             # true_label = int(labels[ex_index])
@@ -286,17 +286,17 @@ def convert_examples_to_text_to_text(
         return_tensors="pt",
     )
 
-    # if text_to_text:
-    #     with tokenizer.as_target_tokenizer():
-    #         labels_list = tokenizer(
-    #             labels_list,
-    #             max_length=max_length,
-    #             padding="max_length",
-    #             add_special_tokens=False,
-    #             return_tensors="pt",
-    #             truncation=False,
-    #             # pad_to_multiple_of=self.pad_to_multiple_of
-    #         )['input_ids']
+    if text_to_text:
+        with tokenizer.as_target_tokenizer():
+            labels_list = tokenizer(
+                labels_list,
+                max_length=max_length,
+                padding="max_length",
+                add_special_tokens=False,
+                return_tensors="pt",
+                truncation=False,
+                # pad_to_multiple_of=self.pad_to_multiple_of
+            )['input_ids']
 
         # label_mask = labels["attention_mask"].bool()
         # TODO: fix label_pad_token_id?
@@ -315,7 +315,7 @@ def convert_examples_to_text_to_text(
     padded = 0
 
 
-    label_pad = np.array([-100] * 1023)
+    # label_pad = np.array([-100] * 1023)
     if 'token_type_ids' in model_inputs:
         for input_ids, attention_mask, token_type_ids, label in zip(model_inputs["input_ids"], model_inputs["attention_mask"], model_inputs['token_type_ids'], model_inputs["labels"]):
             # print(input_ids.shape)
