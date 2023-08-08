@@ -4,31 +4,49 @@ tasks:
     image:
       beaker: ai2/pytorch1.13.0-cuda11.6-python3.9
     command: [bash, /gantry/entrypoint.sh]
-    arguments: [python, -u, experiments/case_hold.py, --task_name, case_hold, --model_name_or_path, microsoft/deberta-base, --output_dir, /results/logs/case_hold/microsoft/deberta-base/seed_1, --do_train, --do_eval, --do_pred, --overwrite_output_dir, --use_lora, "False", --lora_rank, "8", --save_total_limit, "5", --load_best_model_at_end, --metric_for_best_model, micro-f1, --greater_is_better, "True", --evaluation_strategy, steps, --eval_steps, "125", --save_strategy, steps, --save_steps, "1250", --max_steps, "18750", --learning_rate, "5e-5", --per_device_train_batch_size, "8", --per_device_eval_batch_size, "8", --seed, "1", --gradient_accumulation_steps, "1", --eval_accumulation_steps, "1", --dataloader_pin_memory, "False"]
+    arguments: [accelerate, launch, experiments/$EXPERIMENT.py, --task_name, case_hold, --model_name_or_path, "$MODEL", --output_dir, /results/, --do_train, --do_eval, --do_pred, --overwrite_output_dir, --max_seq_length, "$MAX_SEQ_LENGTH", --use_lora, "$USE_LORA", --lora_rank, "$LORA_RANK", --save_total_limit, "1", --load_best_model_at_end, --metric_for_best_model, accuracy, --greater_is_better, "True", --evaluation_strategy, steps, --eval_steps, "$EVAL_STEPS", --save_strategy, steps, --save_steps, "$SAVE_STEPS", --max_steps, "$MAX_STEPS", --learning_rate, "$LEARNING_RATE", --per_device_train_batch_size, "$DEVICE_TRAIN_BATCH_SIZE", --per_device_eval_batch_size, "$DEVICE_EVAL_BATCH_SIZE", --seed, "$SEED", --gradient_accumulation_steps, "1", --dataloader_pin_memory, "False"]
     envVars:
       - name: GANTRY_VERSION
         value: 0.17.0
       - name: GITHUB_REPO
         value: jacob-morrison/lora-investigation
       - name: GIT_REF
-        value: af0b5ace5dd59165b1db955dac76a3ea258821ba
+        value: 9e18c660c1e9f612e96d890789f8cc82966d0fe3
       - name: PYTHON_VERSION
         value: "3.9"
       - name: PIP_REQUIREMENTS_FILE
         value: requirements.txt
+      - name: MODEL
+        value: placeholder
+      - name: METHOD
+        value: placeholder
+      - name: RANK
+        value: -1
+      - name: SEED
+        value: placeholder
+      - name: LEARNING_RATE
+        value: placeholder
+      - name: TASK
+        value: placeholder
+                    # Model
+                    # Size?
+                    # LoRA vs full finetuning
+                    # LoRA Rank (-1 if not using LoRA)
+                    # Seed
+                    # Learning Rate
+                    # Task
     datasets:
       - mountPath: /gantry
         source:
           beaker: 01H5B0SAY5E4KKEXX71RN079Q6
-      - mountPath: /net/nfs.cirrascale
-        source:
-          hostPath: /net/nfs.cirrascale
     result:
       path: /results
     resources:
-      gpuCount: 1
+      gpuCount: 2
     context:
       priority: high
     constraints:
       cluster:
+        - ai2/allennlp-elanding-a100-40g
         - ai2/allennlp-cirrascale
+        - ai2/general-cirrascale

@@ -12,37 +12,25 @@ from typing import Optional
 
 import numpy as np
 import random
-import shutil
-import glob
 
 import transformers
 from transformers import (
 	AutoConfig,
-	AutoModelForCausalLM,
-	AutoModelForSeq2SeqLM,
-	AutoModelForMultipleChoice,
 	AutoModelForSequenceClassification,
 	AutoTokenizer,
 	DataCollatorForSeq2Seq,
-	# DataCollatorForLanguageModeling,
-	DefaultDataCollator,
 	EvalPrediction,
 	HfArgumentParser,
 	LlamaTokenizer,
 	Trainer,
-	TrainingArguments,
 	Seq2SeqTrainer,
 	Seq2SeqTrainingArguments,
-	T5ForSequenceClassification,
 	set_seed,
 )
 from transformers.trainer_utils import is_main_process
-from transformers import EarlyStoppingCallback
-from casehold_helpers import MultipleChoiceDataset, Split, T2TMultipleChoiceDataset, MyDataCollatorForLanguageModeling
+from sequence_classification_helpers import Split, T2TMultipleChoiceDataset
 from sklearn.metrics import f1_score, accuracy_score
-from peft import PeftModel, PeftConfig, get_peft_config, get_peft_model, LoraConfig, TaskType
-import accelerate
-from compute_t5_metrics import compute_t5_metrics
+from peft import get_peft_model, LoraConfig, TaskType
 
 
 logger = logging.getLogger(__name__)
