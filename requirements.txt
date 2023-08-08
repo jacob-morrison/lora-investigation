@@ -19,5 +19,10 @@ scipy>=1.6.3
 sentencepiece
 peft
 protobuf==3.20.0
+termcolor
+jsonlines
+unidic-lite
 einops
 flash-attn
+auto-gptq
+fire
