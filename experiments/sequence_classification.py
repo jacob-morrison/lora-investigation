@@ -61,6 +61,10 @@ class ModelArguments:
 		default=None,
 		metadata={"help": "Where do you want to store the pretrained models downloaded from huggingface.co"},
 	)
+	use_flash_attn: Optional[bool] = field(
+		default=False,
+		metadata={"help": "Do you want to use flash attention with llama"},
+	)
 
 
 @dataclass
@@ -130,6 +134,10 @@ def main():
 		raise ValueError(
 			f"Output directory ({training_args.output_dir}) already exists and is not empty. Use --overwrite_output_dir to overcome."
 		)
+	
+	if model_args.use_flash_attn:
+		from llama_flash_attn_monkey_patch import replace_llama_attn_with_flash_attn
+		replace_llama_attn_with_flash_attn()
 
 	# Setup logging
 	logging.basicConfig(
