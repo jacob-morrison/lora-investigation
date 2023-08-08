@@ -57,6 +57,14 @@ learning_rates = [
 ]
 
 models = {
+    ### don't use long term ###
+    # 'roberta-base': 1,
+    # 'microsoft/deberta-base': 1,
+    # 'roberta-large': 2,
+    # 'microsoft/deberta-large': 2,
+    # t5-v1_1s too, probably
+
+
     ### round 1 ###
     # 'microsoft/deberta-v3-xsmall': 1,
     # 'gpt2': 1,
@@ -65,15 +73,11 @@ models = {
 
     ### round 2 ###
     # 'google/t5-small-lm-adapt': 1,
-    # 'roberta-base': 1,
-    # 'microsoft/deberta-base': 1,
     # 'microsoft/deberta-v3-small': 1,
     # 'microsoft/deberta-v3-base': 1,
 
     ### round 3 ###
     'microsoft/deberta-v3-large': 2,
-    'roberta-large': 2,
-    'microsoft/deberta-large': 2,
     'gpt2-medium': 2,
 
     ### round 3.5 ###
