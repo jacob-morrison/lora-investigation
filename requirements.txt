@@ -8,7 +8,7 @@
 # scipy
 torch==2.0.1
 scipy
-packaging
+# packaging
 accelerate
 # transformers>=4.9.0
 transformers @ git+https://github.com/huggingface/transformers@a6e6b1c622d8d08e2510a82cb6266d7b654f1cbf
@@ -21,10 +21,10 @@ scipy>=1.6.3
 sentencepiece
 peft
 protobuf==3.20.0
-termcolor
-jsonlines
-unidic-lite
-einops
-flash-attn
-auto-gptq
-fire
+# termcolor
+# jsonlines
+# unidic-lite
+# einops
+# flash-attn
+# auto-gptq
+# fire
