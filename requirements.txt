@@ -26,3 +26,4 @@ einops
 flash-attn
 auto-gptq
 fire
+packaging
