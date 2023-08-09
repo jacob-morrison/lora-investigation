@@ -1,0 +1,21 @@
+{description: case-hold-gpt2-medium-full_finetuning-lr_1e-4-seed_1, tasks: [{arguments: [
+        accelerate, launch, experiments/sequence_classification.py, --task_name, case_hold,
+        --model_name_or_path, gpt2-medium, --output_dir, /results/, --do_train, --do_eval,
+        --do_pred, --overwrite_output_dir, --max_seq_length, '1024', --use_lora, 'False',
+        --lora_rank, '0', --save_total_limit, '1', --load_best_model_at_end, --metric_for_best_model,
+        accuracy, --greater_is_better, 'True', --evaluation_strategy, steps, --eval_steps,
+        '1250', --save_strategy, steps, --save_steps, '1250', --max_steps, '18750',
+        --learning_rate, 1e-4, --per_device_train_batch_size, '4', --per_device_eval_batch_size,
+        '8', --seed, '1', --gradient_accumulation_steps, '1', --dataloader_pin_memory,
+        'False'], command: [bash, /gantry/entrypoint.sh], constraints: {cluster: [
+          ai2/allennlp-elanding-a100-40g, ai2/allennlp-cirrascale, ai2/general-cirrascale,
+          ai2/general-cirrascale-a100-80g-ib, ai2/aristo-cirrascale]}, context: {
+        priority: preemptible}, datasets: [{mountPath: /gantry, source: {beaker: 01H5B0SAY5E4KKEXX71RN079Q6}}],
+      envVars: [{name: GANTRY_VERSION, value: 0.17.0}, {name: GITHUB_REPO, value: jacob-morrison/lora-investigation},
+        {name: GIT_REF, value: d138514d7a95c0db3eb797c4e4fd33751136f64f}, {name: PYTHON_VERSION,
+          value: '3.9'}, {name: PIP_REQUIREMENTS_FILE, value: requirements.txt}, {
+          name: MODEL, value: gpt2-medium}, {name: METHOD, value: full_finetuning},
+        {name: RANK, value: -1}, {name: SEED, value: 1}, {name: LEARNING_RATE, value: 1e-4},
+        {name: TASK, value: case-hold}], image: {beaker: ai2/pytorch1.13.0-cuda11.6-python3.9},
+      name: case-hold-gpt2-medium-full_finetuning-lr_1e-4-seed_1, resources: {gpuCount: 2},
+      result: {path: /results}}], version: v2}

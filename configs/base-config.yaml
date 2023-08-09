@@ -4,14 +4,14 @@ tasks:
     image:
       beaker: ai2/pytorch1.13.0-cuda11.6-python3.9
     command: [bash, /gantry/entrypoint.sh]
-    arguments: [accelerate, launch, experiments/$EXPERIMENT.py, --task_name, case_hold, --model_name_or_path, "$MODEL", --output_dir, /results/, --do_train, --do_eval, --do_pred, --overwrite_output_dir, --max_seq_length, "$MAX_SEQ_LENGTH", --use_lora, "$USE_LORA", --lora_rank, "$LORA_RANK", --save_total_limit, "1", --load_best_model_at_end, --metric_for_best_model, accuracy, --greater_is_better, "True", --evaluation_strategy, steps, --eval_steps, "$EVAL_STEPS", --save_strategy, steps, --save_steps, "$SAVE_STEPS", --max_steps, "$MAX_STEPS", --learning_rate, "$LEARNING_RATE", --per_device_train_batch_size, "$DEVICE_TRAIN_BATCH_SIZE", --per_device_eval_batch_size, "$DEVICE_EVAL_BATCH_SIZE", --seed, "$SEED", --gradient_accumulation_steps, "1", --dataloader_pin_memory, "False"]
+    arguments: [accelerate, launch, experiments/$EXPERIMENT.py, --task_name, case_hold, --model_name_or_path, "$MODEL", --output_dir, /results/, --do_train, --do_eval, --do_pred, --overwrite_output_dir, --max_seq_length, "$MAX_SEQ_LENGTH", --use_lora, "$USE_LORA", --lora_rank, "$LORA_RANK", --save_total_limit, "1", --load_best_model_at_end, --metric_for_best_model, accuracy, --greater_is_better, "True", --evaluation_strategy, steps, --eval_steps, "$EVAL_STEPS", --save_strategy, steps, --save_steps, "$SAVE_STEPS", --max_steps, "$MAX_STEPS", --learning_rate, "$LEARNING_RATE", --per_device_train_batch_size, "$DEVICE_TRAIN_BATCH_SIZE", --per_device_eval_batch_size, "$DEVICE_EVAL_BATCH_SIZE", --seed, "$SEED", --gradient_accumulation_steps, "1", --dataloader_pin_memory, "False", --resume_from_checkpoint, "True"]
     envVars:
       - name: GANTRY_VERSION
         value: 0.17.0
       - name: GITHUB_REPO
         value: jacob-morrison/lora-investigation
       - name: GIT_REF
-        value: 9e18c660c1e9f612e96d890789f8cc82966d0fe3
+        value: d138514d7a95c0db3eb797c4e4fd33751136f64f
       - name: PYTHON_VERSION
         value: "3.9"
       - name: PIP_REQUIREMENTS_FILE
@@ -44,9 +44,11 @@ tasks:
     resources:
       gpuCount: 2
     context:
-      priority: high
+      priority: preemptible
     constraints:
       cluster:
         - ai2/allennlp-elanding-a100-40g
         - ai2/allennlp-cirrascale
         - ai2/general-cirrascale
+        - ai2/general-cirrascale-a100-80g-ib
+        - ai2/aristo-cirrascale
