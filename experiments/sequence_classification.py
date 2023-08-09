@@ -406,6 +406,7 @@ def main():
 	# Training
 	if training_args.do_train:
 		trainer.train(
+			resume_from_checkpoint=True
 			# model_path=model_args.model_name_or_path if os.path.isdir(model_args.model_name_or_path) else None
 		)
 		trainer.save_model()

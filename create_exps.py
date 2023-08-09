@@ -77,10 +77,10 @@ models = {
     # 'microsoft/deberta-v3-base': 1,
 
     ### round 3 ###
-    'microsoft/deberta-v3-large': 2,
-    'gpt2-medium': 2,
+    # 'microsoft/deberta-v3-large': 2,
 
     ### round 3.5 ###
+    'gpt2-medium': 2,
     # 'google/t5-v1_1-base': 2,
     # 'google/t5-base-lm-adapt': 2,
     # 'jacobmorrison/tk-instruct-base-lora-experiments': 2,
