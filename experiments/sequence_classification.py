@@ -394,15 +394,6 @@ def main():
 
 	print('device info')
 	print(model.device)
-	logger.info("*** Evaluate ***")
-
-	metrics = trainer.evaluate()
-
-	max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
-	metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
-
-	trainer.log_metrics("eval", metrics)
-	trainer.save_metrics("eval", metrics)
 
     # Detecting last checkpoint.
 	last_checkpoint = None
@@ -418,6 +409,17 @@ def main():
 				f"Checkpoint detected, resuming training at {last_checkpoint}. To avoid this behavior, change "
 				"the `--output_dir` or add `--overwrite_output_dir` to train from scratch."
 			)
+
+	if last_checkpoint is None:
+		logger.info("*** Evaluate ***")
+
+		metrics = trainer.evaluate()
+
+		max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
+		metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+
+		trainer.log_metrics("eval", metrics)
+		trainer.save_metrics("eval", metrics)
 
 	# Training
 	if training_args.do_train:
