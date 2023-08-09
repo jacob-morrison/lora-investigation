@@ -403,13 +403,12 @@ def main():
 		print('--------------------------------')
 
     # Detecting last checkpoint.
-	last_checkpoint = None
+	last_checkpoint = get_last_checkpoint(training_args.output_dir)
 	print('detecting last checkpoint')
 	if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
 		print('calling function')
-		last_checkpoint = get_last_checkpoint(training_args.output_dir)
 		if last_checkpoint is None and len(os.listdir(training_args.output_dir)) > 0:
-			raise ValueError(
+			logger.info(
 				f"Output directory ({training_args.output_dir}) already exists and is not empty. "
 				"Use --overwrite_output_dir to overcome."
 			)

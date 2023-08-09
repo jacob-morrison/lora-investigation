@@ -12,7 +12,7 @@
           ai2/general-cirrascale-a100-80g-ib, ai2/aristo-cirrascale]}, context: {
         priority: preemptible}, datasets: [{mountPath: /gantry, source: {beaker: 01H5B0SAY5E4KKEXX71RN079Q6}}],
       envVars: [{name: GANTRY_VERSION, value: 0.17.0}, {name: GITHUB_REPO, value: jacob-morrison/lora-investigation},
-        {name: GIT_REF, value: 1eb32c842d47d29cc8816ff320a583ca0c860f71}, {name: PYTHON_VERSION,
+        {name: GIT_REF, value: e81b10788a269936cbfea4017ddc50613ec3d2ac}, {name: PYTHON_VERSION,
           value: '3.9'}, {name: PIP_REQUIREMENTS_FILE, value: requirements.txt}, {
           name: MODEL, value: gpt2-medium}, {name: METHOD, value: full_finetuning},
         {name: RANK, value: -1}, {name: SEED, value: 1}, {name: LEARNING_RATE, value: 1e-4},
