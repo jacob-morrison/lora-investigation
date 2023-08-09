@@ -395,6 +395,13 @@ def main():
 	print('device info')
 	print(model.device)
 
+	print('listing directory contents')
+	for (root,dirs,files) in os.walk(training_args.output_dir, topdown=True):
+		print(root)
+		print(dirs)
+		print(files)
+		print('--------------------------------')
+
     # Detecting last checkpoint.
 	last_checkpoint = None
 	if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
