@@ -1,8 +1,8 @@
 {description: case-hold-gpt2-medium-full_finetuning-lr_1e-4-seed_1, tasks: [{arguments: [
         accelerate, launch, experiments/sequence_classification.py, --task_name, case_hold,
         --model_name_or_path, gpt2-medium, --output_dir, /results/, --do_train, --do_eval,
-        --do_pred, --overwrite_output_dir, --max_seq_length, '1024', --use_lora, 'False',
-        --lora_rank, '0', --save_total_limit, '1', --load_best_model_at_end, --metric_for_best_model,
+        --do_pred, --max_seq_length, '1024', --use_lora, 'False', --lora_rank, '0',
+        --save_total_limit, '1', --load_best_model_at_end, --metric_for_best_model,
         accuracy, --greater_is_better, 'True', --evaluation_strategy, steps, --eval_steps,
         '1250', --save_strategy, steps, --save_steps, '1250', --max_steps, '18750',
         --learning_rate, 1e-4, --per_device_train_batch_size, '4', --per_device_eval_batch_size,
@@ -12,7 +12,7 @@
           ai2/general-cirrascale-a100-80g-ib, ai2/aristo-cirrascale]}, context: {
         priority: preemptible}, datasets: [{mountPath: /gantry, source: {beaker: 01H5B0SAY5E4KKEXX71RN079Q6}}],
       envVars: [{name: GANTRY_VERSION, value: 0.17.0}, {name: GITHUB_REPO, value: jacob-morrison/lora-investigation},
-        {name: GIT_REF, value: cece6c7817a602e6cd7356408f421fb62c7eb3bf}, {name: PYTHON_VERSION,
+        {name: GIT_REF, value: 1eb32c842d47d29cc8816ff320a583ca0c860f71}, {name: PYTHON_VERSION,
           value: '3.9'}, {name: PIP_REQUIREMENTS_FILE, value: requirements.txt}, {
           name: MODEL, value: gpt2-medium}, {name: METHOD, value: full_finetuning},
         {name: RANK, value: -1}, {name: SEED, value: 1}, {name: LEARNING_RATE, value: 1e-4},

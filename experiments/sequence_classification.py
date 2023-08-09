@@ -404,7 +404,9 @@ def main():
 
     # Detecting last checkpoint.
 	last_checkpoint = None
+	print('detecting last checkpoint')
 	if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
+		print('calling function')
 		last_checkpoint = get_last_checkpoint(training_args.output_dir)
 		if last_checkpoint is None and len(os.listdir(training_args.output_dir)) > 0:
 			raise ValueError(
@@ -416,6 +418,8 @@ def main():
 				f"Checkpoint detected, resuming training at {last_checkpoint}. To avoid this behavior, change "
 				"the `--output_dir` or add `--overwrite_output_dir` to train from scratch."
 			)
+
+	print('last checkpoint: ' + str(last_checkpoint))
 
 	if last_checkpoint is None:
 		logger.info("*** Evaluate ***")
