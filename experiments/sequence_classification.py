@@ -74,7 +74,7 @@ class DataTrainingArguments:
 	Arguments pertaining to what data we are going to input our model for training and eval.
 	"""
 
-	task_name: str = field(default="case_hold", metadata={"help": "The name of the task to train on"})
+	task_name: str = field(default="case-hold", metadata={"help": "The name of the task to train on"})
 	max_seq_length: int = field(
 		default=256,
 		metadata={
@@ -167,7 +167,7 @@ def main():
 	set_seed(training_args.seed)
 
 	num_classes = {
-		'case_hold': 5,
+		'case-hold': 5,
 		'qnli': 2,
 	}
 
@@ -190,7 +190,7 @@ def main():
 		model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
 		cache_dir=model_args.cache_dir,
 		# Default fast tokenizer is buggy on CaseHOLD task, switch to legacy tokenizer
-		use_fast=data_args.task_name != 'case_hold', # True,
+		use_fast=data_args.task_name != 'case-hold', # True,
 	)
 	if 'gpt2' in model_args.model_name_or_path:
 		tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})

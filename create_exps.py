@@ -25,8 +25,8 @@ seeds = [
     1,
     2,
     3,
-    4,
-    5,
+    # 4,
+    # 5,
 ]
 
 experiments = [
@@ -48,7 +48,8 @@ learning_rates = [
     # '1e-2',
     # '5e-3',
     # '1e-3',
-    # '5e-4',
+
+    '5e-4',
     '1e-4',
     '5e-5',
     '1e-5',
@@ -63,46 +64,60 @@ models = {
     # 'roberta-large': 2,
     # 'microsoft/deberta-large': 2,
     # t5-v1_1s too, probably
+    # 'google/t5-v1_1-small': 1,
+    # 'google/t5-v1_1-base': 2,
+    # 'google/t5-v1_1-large': 2,
+    # 'google/t5-v1_1-xl': 4,
+    # 'google/t5-v1_1-xxl': 8,
+
+
+
 
 
     ### round 1 ###
-    # 'microsoft/deberta-v3-xsmall': 1,
-    # 'gpt2': 1,
-    # 'google/t5-v1_1-small': 1,
-    # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+    'microsoft/deberta-v3-xsmall': 1,
+    'gpt2': 1,
+    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
 
     ### round 2 ###
-    # 'google/t5-small-lm-adapt': 1,
-    # 'microsoft/deberta-v3-small': 1,
-    # 'microsoft/deberta-v3-base': 1,
+    'google/t5-small-lm-adapt': 1,
+    'microsoft/deberta-v3-small': 1,
+    'microsoft/deberta-v3-base': 1,
 
     ### round 3 ###
     # 'microsoft/deberta-v3-large': 2,
 
     ### round 3.5 ###
-    'gpt2-medium': 2,
-    # 'google/t5-v1_1-base': 2,
+    # 'gpt2-medium': 2,
     # 'google/t5-base-lm-adapt': 2,
     # 'jacobmorrison/tk-instruct-base-lora-experiments': 2,
+    # 'microsoft/deberta-v2-xlarge': 4,
 
     ### round 4 ###
-    # 'microsoft/deberta-v2-xlarge': 2,
-    # 'gpt2-large': 2,
-    # 'google/t5-v1_1-large': 2,
-    # 'jacobmorrison/tk-instruct-large-lora-experiments': 2,
+    # 'google/t5-large-lm-adapt': 4,
+    # 'gpt2-large': 4,
+    # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
 
     ### round 5 ###
-    # 'microsoft/deberta-v2-xxlarge': 4,
     # 'gpt2-xl': 4,
-    # 'google/t5-v1_1-xl': 4,
+    # 'microsoft/deberta-v2-xxlarge': 4,
+    # 'google/t5-xl-lm-adapt': 4,
     # 'jacobmorrison/tk-instruct-xl-lora-experiments': 4,
 
     # TODO: decide # of GPUs for these ones
     ### round 6 ###
-    # 'google/t5-v1_1-xxl': 8,
+    # 'google/t5-xxl-lm-adapt': 8,
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B': 8,
+    # 'decapoda-research/llama-7b-hf': 8,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/13B': 8,
+}
+    
+xl_models = {
+    'gpt2-xl': 4,
+    'microsoft/deberta-v2-xxlarge': 4,
+    'google/t5-xl-lm-adapt': 4,
+    'jacobmorrison/tk-instruct-xl-lora-experiments': 4,
 }
 
 LoRA_ranks = {
@@ -146,14 +161,14 @@ LoRA_ranks = {
 }
 
 methods = [
-    'full_finetuning',
-    # 'lora_1',
-    # 'lora_2',
-    # 'lora_4',
-    'lora_8',
-    # 'lora_16',
-    # 'lora_32',
-    # 'lora_64',
+    # 'full_finetuning',
+    'lora_1',
+    'lora_2',
+    'lora_4',
+    # 'lora_8',
+    'lora_16',
+    'lora_32',
+    'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -167,13 +182,19 @@ for experiment in experiments:
         for seed in seeds:
             for learning_rate in learning_rates:
                 for method in methods:
+                    if model in xl_models:
+                        batch_size_constant = xl_models[model]
+                    else:
+                        batch_size_constant = 8
                     num_instances_for_eval = 10000
+                    # print(models[model])
                     num_gpus = int(models[model])
-                    eval_batch_size = 8
-                    train_batch_size = int(8 / num_gpus)
+                    # print(num_gpus)
+                    eval_batch_size = batch_size_constant
+                    train_batch_size = int(batch_size_constant / num_gpus)
                     max_train_steps = int(150000 / (train_batch_size * num_gpus))
-                    save_steps = int(num_instances_for_eval / 8)
-                    eval_steps = int(num_instances_for_eval / 8)
+                    save_steps = int(num_instances_for_eval / batch_size_constant)
+                    eval_steps = int(num_instances_for_eval / batch_size_constant)
 
                     d = copy.deepcopy(d1)
                     d['tasks'][0]['envVars'][8]['value'] = seed # SEED
@@ -186,6 +207,8 @@ for experiment in experiments:
                                 d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$EXPERIMENT', 'question_answering')
                             else:
                                 d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$EXPERIMENT', 'sequence_classification')
+                        if '$TASK' in d['tasks'][0]['arguments'][i]:
+                            d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$TASK', experiment)
                         if '$MODEL' in d['tasks'][0]['arguments'][i]:
                             d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$MODEL', model)
                         if '$SEED' in d['tasks'][0]['arguments'][i]:
@@ -227,8 +250,9 @@ for experiment in experiments:
                             d['tasks'][0]['arguments'][i] = d['tasks'][0]['arguments'][i].replace('$DEVICE_EVAL_BATCH_SIZE', str(eval_batch_size))
 
 
-                    if 'llama' in model or 'gpt2-xl' in model:
-                        d['tasks'][0]['constraints']['cluster'] = ['ai2/allennlp-cirrascale']
+                    if model in xl_models:
+                        d['tasks'][0]['constraints']['cluster'] = ['ai2/allennlp-cirrascale', 'ai2/general-cirrascale-a100-80g-ib']
+                        # d['tasks'][0]['constraints']['cluster'] = ['ai2/general-cirrascale-a5000']
 
                     model_for_name = model.replace('/', '-')
                     name = f'{experiment}-{model_for_name}-{method}-lr_{learning_rate}-seed_{seed}'

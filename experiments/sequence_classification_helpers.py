@@ -54,7 +54,7 @@ if is_torch_available():
             max_samples: Optional[int] = None,
             model_type: Optional[str]=None,
         ):
-            if task == 'case_hold':
+            if task == 'case-hold':
                 dataset = datasets.load_dataset('lex_glue', task)
             elif task == 'qnli':
                 dataset = datasets.load_dataset('glue', task)
@@ -127,7 +127,7 @@ def convert_examples_to_text_to_text(
 
     # put each example together
 
-    if task == 'case_hold':
+    if task == 'case-hold':
         choices = [
             'A',
             'B',
@@ -171,11 +171,11 @@ def convert_examples_to_text_to_text(
     for (ex_index, context) in tqdm.tqdm(enumerate(contexts), desc="convert examples to t2t"):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(contexts)))
-        if task == 'case_hold':
+        if task == 'case-hold':
             processed_example = context + '.'
             ending = ' '
             if include_instruction:
-                if task == 'case_hold':
+                if task == 'case-hold':
                     processed_example = 'What is the correct holding statement for the following text?\nText: ' + processed_example
 
             for choice, option in zip(choices, endings[ex_index]):
