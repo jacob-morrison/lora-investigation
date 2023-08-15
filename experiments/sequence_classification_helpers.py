@@ -55,9 +55,9 @@ if is_torch_available():
             model_type: Optional[str]=None,
         ):
             if task == 'case-hold':
-                dataset = datasets.load_dataset('lex_glue', task)
+                dataset = datasets.load_dataset('lex_glue', 'case_hold')
             elif task == 'qnli':
-                dataset = datasets.load_dataset('glue', task)
+                dataset = datasets.load_dataset('glue', 'qnli')
                 # no test labels
             elif task == 'piqa':
                 dataset = datasets.load_dataset("piqa")
