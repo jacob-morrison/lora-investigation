@@ -18,7 +18,7 @@ accelerate launch \
     --mixed_precision bf16 \
     experiments/sequence_classification.py \
     --task_name case-hold \
-    --model_name_or_path MODEL_NAME \
+    --model_name_or_path $MODEL_NAME \
     --output_dir ../output/ \
     --do_train \
     --do_eval \
