@@ -11,7 +11,7 @@ tasks:
       - name: GITHUB_REPO
         value: jacob-morrison/lora-investigation
       - name: GIT_REF
-        value: c0c06e33fcb312bfed55e17795cfb176509974a3
+        value: 46c2494f48321610f91e37ecfda26f5ea265d7a9
       - name: PYTHON_VERSION
         value: "3.9"
       - name: PIP_REQUIREMENTS_FILE
@@ -49,8 +49,14 @@ tasks:
       cluster:
         - ai2/allennlp-elanding-a100-40g
         - ai2/allennlp-cirrascale
+        - ai2/climate-cirrascale
         - ai2/general-cirrascale
         - ai2/general-cirrascale-a100-80g-ib
+        - ai2/general-cirrascale-a5000
         - ai2/aristo-cirrascale
+        - ai2/aristo-elanding-a6000
         - ai2/mosaic-cirrascale
+        - ai2/mosaic-cirrascale-a100
+        - ai2/mosaic-elanding-rtx8000
         - ai2/s2-cirrascale
+        - ai2/s2-elanding

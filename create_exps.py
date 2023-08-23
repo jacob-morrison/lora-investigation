@@ -5,6 +5,7 @@ import random
 from datetime import date
 import time
 import os
+from math import ceil
 
 today = date.today().strftime("%m%d%Y")
 
@@ -47,14 +48,14 @@ experiments = [
 learning_rates = [
     # '1e-2',
     # '5e-3',
-    # '1e-3',
+    '1e-3',
 
-    '5e-4',
-    '1e-4',
-    '5e-5',
-    '1e-5',
-    '5e-6',
-    '1e-6',
+    # '5e-4',
+    # '1e-4',
+    # '5e-5',
+    # '1e-5',
+    # '5e-6',
+    # '1e-6',
 ]
 
 models = {
@@ -76,41 +77,44 @@ models = {
 
     ### round 1 ###
     'microsoft/deberta-v3-xsmall': 1,
-    'gpt2': 1,
-    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
-
-    ### round 2 ###
-    'google/t5-small-lm-adapt': 1,
     'microsoft/deberta-v3-small': 1,
     'microsoft/deberta-v3-base': 1,
 
+    ### round 2 ###
+    # 'google/t5-small-lm-adapt': 1,
+    # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+    # 'gpt2': 1,
+
     ### round 3 ###
     # 'microsoft/deberta-v3-large': 2,
-
-    ### round 3.5 ###
     # 'gpt2-medium': 2,
     # 'google/t5-base-lm-adapt': 2,
     # 'jacobmorrison/tk-instruct-base-lora-experiments': 2,
-    # 'microsoft/deberta-v2-xlarge': 4,
 
     ### round 4 ###
+    # 'microsoft/deberta-v2-xlarge': 4,
     # 'google/t5-large-lm-adapt': 4,
     # 'gpt2-large': 4,
     # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
 
+
+    ## TODO: still do:     'lora_1','lora_2','lora_4','lora_16','lora_32','lora_64',
     ### round 5 ###
     # 'gpt2-xl': 4,
     # 'microsoft/deberta-v2-xxlarge': 4,
+
+    ### round 6 ###
     # 'google/t5-xl-lm-adapt': 4,
     # 'jacobmorrison/tk-instruct-xl-lora-experiments': 4,
 
     # TODO: decide # of GPUs for these ones
-    ### round 6 ###
+    ### round 7 ###
     # 'google/t5-xxl-lm-adapt': 8,
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B': 8,
-    # 'decapoda-research/llama-7b-hf': 8,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/13B': 8,
+
+    # 'decapoda-research/llama-7b-hf': 8,
 }
     
 xl_models = {
@@ -130,9 +134,9 @@ LoRA_ranks = {
     'microsoft/deberta-v2-xlarge': 6016,
     'microsoft/deberta-v2-xxlarge': 5314,
 
-    'microsoft/deberta-v3-xsmall': 1,
-    'microsoft/deberta-v3-small': 1,
-    'microsoft/deberta-v3-base': 1,
+    'microsoft/deberta-v3-xsmall': 3843, # 769, 
+    'microsoft/deberta-v3-small': 7699,
+    'microsoft/deberta-v3-base': 5003,
     'microsoft/deberta-v3-large': 1,
 
     'gpt2': 3376,
@@ -161,17 +165,31 @@ LoRA_ranks = {
 }
 
 methods = [
-    # 'full_finetuning',
-    'lora_1',
-    'lora_2',
-    'lora_4',
-    # 'lora_8',
-    'lora_16',
-    'lora_32',
-    'lora_64',
+    # # 'full_finetuning',
+    # 'lora_1',
+    # 'lora_2',
+    # 'lora_4',
+    # # 'lora_8',
+    # 'lora_16',
+    # 'lora_32',
+    # 'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
+    
+# 3 seeds * 3 learning rates * 22 models * 13 methods * 10 tasks
+
+model_specific_lora_ranks = {}
+
+coefficients = [0.2, 0.4, 0.6, 0.8]
+    
+for model in LoRA_ranks:
+    model_specific_lora_ranks[model] = []
+    if LoRA_ranks[model] != 0:
+        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+        for coefficient in coefficients:
+            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+
 
 for experiment in experiments:
     with open('configs/base-config.yaml', 'r') as f:
@@ -181,7 +199,7 @@ for experiment in experiments:
     for model in models:
         for seed in seeds:
             for learning_rate in learning_rates:
-                for method in methods:
+                for method in methods + model_specific_lora_ranks[model]:
                     if model in xl_models:
                         batch_size_constant = xl_models[model]
                     else:
