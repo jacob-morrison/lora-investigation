@@ -31,16 +31,16 @@ seeds = [
 ]
 
 experiments = [
-    'case-hold',
-    # 'qnli',
-    # 'piqa',
-    # 'arc-easy',
-    # 'arc-challenge',
-    # 'sciq',
-    # 'hellaswag',
-    # 'mathqa',
-    # 'mnli',
+    # 'case-hold',
+    'qnli',
+    'arc-easy',
+    'arc-challenge',
+    'sciq',
+    'hellaswag',
+    'mnli',
     # 'yelp',
+    # 'piqa',
+    # 'mathqa',
     # 'squad',
 ]
 
@@ -51,9 +51,9 @@ learning_rates = [
 
     # TODO: limit which we choose
     # '1e-3',
-    '5e-4',
+    # '5e-4',
     '1e-4',
-    '5e-5',
+    # '5e-5',
     # '1e-5',
     # '5e-6',
     # '1e-6',
@@ -78,7 +78,7 @@ models = {
 
 
     ### round 1 ###
-    # 'microsoft/deberta-v3-xsmall': 1,
+    'microsoft/deberta-v3-xsmall': 1,
     # 'microsoft/deberta-v3-small': 1,
     # 'microsoft/deberta-v3-base': 1,
 
@@ -104,7 +104,7 @@ models = {
 
     ## TODO: still do:     'lora_1','lora_2','lora_4','lora_16','lora_32','lora_64',
     ### round 5 ###
-    'gpt2-xl': 4,
+    # 'gpt2-xl': 4,
     # 'microsoft/deberta-v2-xxlarge': 4,
 
     ### round 6 ###
@@ -170,11 +170,11 @@ LoRA_ranks = {
 
 methods = [
     # 'full_finetuning',
-    # 'lora_8',
     # 'lora_1',
     # 'lora_2',
-    'lora_4',
-    # 'lora_16',
+    # 'lora_4',
+    # 'lora_8',
+    'lora_16',
     # 'lora_32',
     # 'lora_64',
     
