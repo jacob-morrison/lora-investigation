@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 from typing import Any, List, NewType, Optional
+import random
 
 import tqdm
 
@@ -57,11 +58,7 @@ if is_torch_available():
             if task == 'case-hold':
                 dataset = datasets.load_dataset('lex_glue', 'case_hold')
             elif task == 'qnli':
-                dataset = datasets.load_dataset('glue', 'qnli')
-                # no test labels
-            elif task == 'piqa':
-                dataset = datasets.load_dataset("piqa")
-                # no test labels
+                dataset = datasets.load_dataset('glue', 'qnli')    
             elif task == 'arc-easy':
                 dataset = datasets.load_dataset("ai2_arc", 'ARC-Easy')
             elif task == 'arc-challenge':
@@ -70,24 +67,28 @@ if is_torch_available():
                 dataset = datasets.load_dataset("sciq")
             elif task == 'hellaswag':
                 dataset = datasets.load_dataset("hellaswag")
-                # no test labels
-            elif task == 'mathqa':
-                dataset = datasets.load_dataset("math_qa")
-            elif task == 'mnli':
+            elif task == 'mnli': # validation_matched # validation_mismatched
                 dataset = datasets.load_dataset("multi_nli")
-                # validation_matched
-                # validation_mismatched
-            elif task == 'yelp':
+            elif task == 'yelp': # no validation
                 dataset = datasets.load_dataset("yelp_polarity")
-                # no validation
+            elif task == 'mathqa': # no test labels
+                dataset = datasets.load_dataset("math_qa")
+            elif task == 'piqa': # no test labels
+                dataset = datasets.load_dataset("piqa") 
             else:
                 print('invalid task: ' + task)
 
 
             if mode == Split.dev:
-                examples = dataset['validation']
+                if task == 'yelp':
+                    examples = dataset['validation_matched']
+                else:
+                    examples = dataset['validation']
             elif mode == Split.test:
-                examples = dataset['test']
+                if task == 'yelp':
+                    examples = dataset['validation_mismatched']
+                else:
+                    examples = dataset['test']
             elif mode == Split.train:
                 examples = dataset['train']
             logger.info("Training examples: %s", len(examples))
@@ -146,21 +147,35 @@ def convert_examples_to_text_to_text(
         contexts = examples['sentence']
         questions = examples['question']
         labels = examples['label']
+    elif task == 'arc-easy' or task == 'arc-challenge':
+        choices = ['A', 'B', 'C', 'D']
+        contexts = examples['question']
+        endings = examples['choices']
+        labels = examples['answerKey']
+    elif task == 'sciq':
+        choices ['A', 'B', 'C', 'D']
+        contexts = examples['question']
+        endings = zip(examples['distractor1'], examples['distractor2'], examples['distractor3'], examples['correct_answer'])
+        labels = []
+    elif task == 'hellaswag':
+        choices ['A', 'B', 'C', 'D']
+        contexts = examples['ctx']
+        endings = examples['endings']
+        labels = examples['label']
+    elif task == 'mnli':
+        choices = [
+            'true',
+            'neutral',
+            'false',
+        ]
+        contexts = examples['premise']
+        endings = examples['hypothesis']
+        labels = examples['label']
+    elif task == 'yelp':
+        pass
     elif task == 'piqa':
         pass
-    elif task == 'arc-easy':
-        pass
-    elif task == 'arc-challenge':
-        pass
-    elif task == 'sciq':
-        pass
-    elif task == 'hellaswag':
-        pass
     elif task == 'mathqa':
-        pass
-    elif task == 'mnli':
-        pass
-    elif task == 'yelp':
         pass
     else:
         print('invalid task: ' + task)
@@ -189,21 +204,60 @@ def convert_examples_to_text_to_text(
             ending = ' ' + questions[ex_index] + ' '
             if include_instruction:
                 pass
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+        elif task == 'arc-easy' or task == 'arc-challenge':
+            processed_example = context + '.'
+            ending = ' '
+            for choice, option in zip(choices, endings[ex_index]):
+                ending += '\n(' + choice + '): ' + option + ' '
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+        elif task == 'sciq':
+            processed_example = context + '.'
+            ending = ' '
+            (distractor1, distractor2, distractor3, correct_answer) = endings[ex_index]
+            options = [
+                (distractor1, 'incorrect'),
+                (distractor2, 'incorrect'),
+                (distractor3, 'incorrect'),
+                (correct_answer, 'correct'),
+            ]
+            for choice, (option, status) in zip(choices, random.shuffle(options)):
+                ending += '\n(' + choice + '): ' + option + ' '
+                if status == 'correct':
+                    labels.append(choice)
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+        elif task == 'hellaswag':
+            processed_example = context
+            ending = ' '
+            for choice, option in zip(choices, endings[ex_index]):
+                ending += '\n(' + choice + '): ' + option + ' '
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+        elif task == 'mnli':
+            if label[ex_index] == -1:
+                continue
+            processed_example = context + '.'
+            ending = ' ' + endings[ex_index] + ' '
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+        elif task == 'yelp':
+            pass
         elif task == 'piqa':
             pass
-        elif task == 'arc-easy':
-            pass
-        elif task == 'arc-challenge':
-            pass
-        elif task == 'sciq':
-            pass
-        elif task == 'hellaswag':
-            pass
         elif task == 'mathqa':
-            pass
-        elif task == 'mnli':
-            pass
-        elif task == 'yelp':
             pass
         else:
             print('invalid task: ' + task)

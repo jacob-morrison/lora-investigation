@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 TASK = 'case-hold'
-MODEL = 'microsoft/deberta-v3-base'
+# MODEL = 'microsoft/deberta-v3-base'
+MODEL = 'microsoft/deberta-v3-large'
 
 data = get_data(TASK)
 

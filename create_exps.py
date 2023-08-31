@@ -48,14 +48,16 @@ experiments = [
 learning_rates = [
     # '1e-2',
     # '5e-3',
-    '1e-3',
 
-    # '5e-4',
-    # '1e-4',
-    # '5e-5',
+    # TODO: limit which we choose
+    # '1e-3',
+    '5e-4',
+    '1e-4',
+    '5e-5',
     # '1e-5',
     # '5e-6',
     # '1e-6',
+    # '5e-7',
 ]
 
 models = {
@@ -76,9 +78,9 @@ models = {
 
 
     ### round 1 ###
-    'microsoft/deberta-v3-xsmall': 1,
-    'microsoft/deberta-v3-small': 1,
-    'microsoft/deberta-v3-base': 1,
+    # 'microsoft/deberta-v3-xsmall': 1,
+    # 'microsoft/deberta-v3-small': 1,
+    # 'microsoft/deberta-v3-base': 1,
 
     ### round 2 ###
     # 'google/t5-small-lm-adapt': 1,
@@ -93,6 +95,8 @@ models = {
 
     ### round 4 ###
     # 'microsoft/deberta-v2-xlarge': 4,
+
+    # TODO: next for % lora ranks
     # 'google/t5-large-lm-adapt': 4,
     # 'gpt2-large': 4,
     # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
@@ -100,7 +104,7 @@ models = {
 
     ## TODO: still do:     'lora_1','lora_2','lora_4','lora_16','lora_32','lora_64',
     ### round 5 ###
-    # 'gpt2-xl': 4,
+    'gpt2-xl': 4,
     # 'microsoft/deberta-v2-xxlarge': 4,
 
     ### round 6 ###
@@ -137,21 +141,21 @@ LoRA_ranks = {
     'microsoft/deberta-v3-xsmall': 3843, # 769, 
     'microsoft/deberta-v3-small': 7699,
     'microsoft/deberta-v3-base': 5003,
-    'microsoft/deberta-v3-large': 1,
+    'microsoft/deberta-v3-large': 4426,
 
     'gpt2': 3376,
     'gpt2-medium': 3610,
     'gpt2-large': 4200,
     'gpt2-xl': 5071,
 
-    'google/t5-v1_1-small': 1,
-    'google/t5-v1_1-base': 1,
-    'google/t5-v1_1-large': 1,
-    'google/t5-v1_1-xl': 1,
+    'google/t5-small-lm-adapt': 1414,
+    'google/t5-base-lm-adapt': 2021,
+    'google/t5-large-lm-adapt': 2548,
+    'google/t5-xl-lm-adapt': 1,
 
-    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
-    'jacobmorrison/tk-instruct-base-lora-experiments': 1,
-    'jacobmorrison/tk-instruct-large-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-small-lora-experiments': 1413,
+    'jacobmorrison/tk-instruct-base-lora-experiments': 2021,
+    'jacobmorrison/tk-instruct-large-lora-experiments': 2548,
     'jacobmorrison/tk-instruct-xl-lora-experiments': 1,
 
     'huggyllama/llama-7b': 1,
@@ -160,16 +164,16 @@ LoRA_ranks = {
     # 'huggyllama/llama-13b',
     # 'llama-2-7b,
     # 'llama-2-13b,
-    # 'google/t5-v1_1-xxl',
+    # 'google/t5-xxl-lm-adapt',
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments',
 }
 
 methods = [
-    # # 'full_finetuning',
+    # 'full_finetuning',
+    # 'lora_8',
     # 'lora_1',
     # 'lora_2',
-    # 'lora_4',
-    # # 'lora_8',
+    'lora_4',
     # 'lora_16',
     # 'lora_32',
     # 'lora_64',
@@ -181,14 +185,19 @@ methods = [
 
 model_specific_lora_ranks = {}
 
-coefficients = [0.2, 0.4, 0.6, 0.8]
+coefficients = [
+    0.2,
+    0.4,
+    0.6,
+    0.8
+]
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    if LoRA_ranks[model] != 0:
-        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-        for coefficient in coefficients:
-            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    # if LoRA_ranks[model] != 1:
+    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+    #     for coefficient in coefficients:
+    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:
@@ -285,7 +294,10 @@ for experiment in experiments:
                     yaml.dump(d, file, default_flow_style=True)
                     file.close()
 
-                    cmd = "beaker experiment create {} --workspace ai2/lora-vs-full-finetuning".format(fn)
+                    workspace_subset = ''
+                    if experiment != 'case-hold':
+                        workspace_subset = '-' + experiment
+                    cmd = ("beaker experiment create {} --workspace ai2/lora-vs-full-finetuning" + workspace_subset).format(fn)
                     subprocess.Popen(cmd, shell=True)
                     time.sleep(3)
 

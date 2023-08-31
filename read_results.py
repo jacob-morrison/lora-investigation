@@ -52,9 +52,21 @@ def create_data_frame(data):
                     if model not in max_scores:
                         max_scores[model] = {}
                     if method not in max_scores[model]:
-                        max_scores[model][method] = (float(data[model][method][learning_rate][seed]), learning_rate)
-                    if float(data[model][method][learning_rate][seed]) > max_scores[model][method][0]:
-                        max_scores[model][method] = (float(data[model][method][learning_rate][seed]), learning_rate)
+                        max_scores[model][method] = {
+                            'best score': float(data[model][method][learning_rate][seed]),
+                            'best learning rate': learning_rate, # best
+                            'lowest learning rate': learning_rate, # lowest
+                            'highest learning rate': learning_rate # highest
+                        }
+                    if float(data[model][method][learning_rate][seed]) > max_scores[model][method]['best score']:
+                        # max_scores[model][method] = (float(data[model][method][learning_rate][seed]), learning_rate)
+                        max_scores[model][method]['best score'] = float(data[model][method][learning_rate][seed])
+                        max_scores[model][method]['best learning rate'] = learning_rate
+                    if float(learning_rate) < float(max_scores[model][method]['lowest learning rate']):
+                        max_scores[model][method]['lowest learning rate'] = learning_rate
+                    if float(learning_rate) > float(max_scores[model][method]['highest learning rate']):
+                        max_scores[model][method]['highest learning rate'] = learning_rate
+
 
     pprint(max_scores)
     # flatten by building a list of maps, model + method + rank (if applicable) + LR + seed
