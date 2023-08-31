@@ -169,6 +169,14 @@ def main():
 	num_classes = {
 		'case-hold': 5,
 		'qnli': 2,
+		'arc-easy': 4,
+		'arc-challenge': 4,
+		'sciq': 4,
+		'hellaswag': 4,
+		'mnli': 3,
+		'yelp': -1,
+		'mathqa': -1,
+		'piqa': -1,
 	}
 
 	# Load pretrained model and tokenizer

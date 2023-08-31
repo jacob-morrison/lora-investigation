@@ -11,7 +11,7 @@ tasks:
       - name: GITHUB_REPO
         value: jacob-morrison/lora-investigation
       - name: GIT_REF
-        value: f1e532c62ec84eef14f073580bf7b5920b83fa6a
+        value: b2d1ba15ca87e944fad3a0ef92d551714f2c6fee
       - name: PYTHON_VERSION
         value: "3.9"
       - name: PIP_REQUIREMENTS_FILE
