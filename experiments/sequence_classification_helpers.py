@@ -65,10 +65,10 @@ if is_torch_available():
                 dataset = datasets.load_dataset("ai2_arc", 'ARC-Challenge')
             elif task == 'sciq':
                 dataset = datasets.load_dataset("sciq")
-            elif task == 'hellaswag':
-                dataset = datasets.load_dataset("hellaswag")
             elif task == 'mnli': # validation_matched # validation_mismatched
                 dataset = datasets.load_dataset("multi_nli")
+            elif task == 'hellaswag': # no test labels
+                dataset = datasets.load_dataset("hellaswag")
             elif task == 'yelp': # no validation
                 dataset = datasets.load_dataset("yelp_polarity")
             elif task == 'mathqa': # no test labels
@@ -153,15 +153,10 @@ def convert_examples_to_text_to_text(
         endings = examples['choices']
         labels = examples['answerKey']
     elif task == 'sciq':
-        choices ['A', 'B', 'C', 'D']
+        choices = ['A', 'B', 'C', 'D']
         contexts = examples['question']
         endings = zip(examples['distractor1'], examples['distractor2'], examples['distractor3'], examples['correct_answer'])
         labels = []
-    elif task == 'hellaswag':
-        choices ['A', 'B', 'C', 'D']
-        contexts = examples['ctx']
-        endings = examples['endings']
-        labels = examples['label']
     elif task == 'mnli':
         choices = [
             'true',
@@ -170,6 +165,11 @@ def convert_examples_to_text_to_text(
         ]
         contexts = examples['premise']
         endings = examples['hypothesis']
+        labels = examples['label']
+    elif task == 'hellaswag':
+        choices = ['A', 'B', 'C', 'D']
+        contexts = examples['ctx']
+        endings = examples['endings']
         labels = examples['label']
     elif task == 'yelp':
         pass
@@ -199,6 +199,7 @@ def convert_examples_to_text_to_text(
             if ex_index == 0:
                 print(processed_example)
                 print(ending)
+            label = labels[ex_index]
         elif task == 'qnli':
             processed_example = context + '.'
             ending = ' ' + questions[ex_index] + ' '
@@ -208,6 +209,7 @@ def convert_examples_to_text_to_text(
             if ex_index == 0:
                 print(processed_example)
                 print(ending)
+            label = labels[ex_index]
         elif task == 'arc-easy' or task == 'arc-challenge':
             processed_example = context + '.'
             ending = ' '
@@ -217,6 +219,7 @@ def convert_examples_to_text_to_text(
             if ex_index == 0:
                 print(processed_example)
                 print(ending)
+            label = choices.index(labels[ex_index])
         elif task == 'sciq':
             processed_example = context + '.'
             ending = ' '
@@ -235,6 +238,7 @@ def convert_examples_to_text_to_text(
             if ex_index == 0:
                 print(processed_example)
                 print(ending)
+            label = choices.index(labels[ex_index])
         elif task == 'hellaswag':
             processed_example = context
             ending = ' '
@@ -244,8 +248,9 @@ def convert_examples_to_text_to_text(
             if ex_index == 0:
                 print(processed_example)
                 print(ending)
+            label = choices.index(labels[ex_index])
         elif task == 'mnli':
-            if label[ex_index] == -1:
+            if labels[ex_index] == -1:
                 continue
             processed_example = context + '.'
             ending = ' ' + endings[ex_index] + ' '
@@ -253,6 +258,7 @@ def convert_examples_to_text_to_text(
             if ex_index == 0:
                 print(processed_example)
                 print(ending)
+            label = labels[ex_index]
         elif task == 'yelp':
             pass
         elif task == 'piqa':
@@ -265,9 +271,9 @@ def convert_examples_to_text_to_text(
         processed_examples.append(processed_example)
         input_endings.append(ending)
         if text_to_text:
-            labels_list.append([int(labels[ex_index])])
+            labels_list.append([int(label)])
         else:
-            labels_list.append(torch.tensor(int(labels[ex_index])))
+            labels_list.append(torch.tensor(int(label)))
 
     model_inputs = tokenizer(
         processed_examples,
