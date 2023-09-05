@@ -36,8 +36,8 @@ experiments = [
     'arc-easy',
     'arc-challenge',
     'sciq',
-    'hellaswag',
     'mnli',
+    # 'hellaswag',
     # 'yelp',
     # 'piqa',
     # 'mathqa',
@@ -52,9 +52,9 @@ learning_rates = [
     # TODO: limit which we choose
     # '1e-3',
     # '5e-4',
-    '1e-4',
+    # '1e-4',
     # '5e-5',
-    # '1e-5',
+    '1e-5',
     # '5e-6',
     # '1e-6',
     # '5e-7',
@@ -169,12 +169,12 @@ LoRA_ranks = {
 }
 
 methods = [
-    # 'full_finetuning',
+    'full_finetuning',
     # 'lora_1',
     # 'lora_2',
     # 'lora_4',
     # 'lora_8',
-    'lora_16',
+    # 'lora_16',
     # 'lora_32',
     # 'lora_64',
     

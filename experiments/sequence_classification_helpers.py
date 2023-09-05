@@ -80,12 +80,12 @@ if is_torch_available():
 
 
             if mode == Split.dev:
-                if task == 'yelp':
+                if task == 'mnli':
                     examples = dataset['validation_matched']
                 else:
                     examples = dataset['validation']
             elif mode == Split.test:
-                if task == 'yelp':
+                if task == 'mnli':
                     examples = dataset['validation_mismatched']
                 else:
                     examples = dataset['test']
@@ -149,13 +149,27 @@ def convert_examples_to_text_to_text(
         labels = examples['label']
     elif task == 'arc-easy' or task == 'arc-challenge':
         choices = ['A', 'B', 'C', 'D']
+        label_map = {
+            '1': 'A',
+            '2': 'B',
+            '3': 'C',
+            '4': 'D',
+        }
+
+        def fix_labels(label):
+            if label in label_map:
+                return label_map[label]
+            else:
+                return label
+
         contexts = examples['question']
         endings = examples['choices']
         labels = examples['answerKey']
+        labels = list(map(fix_labels, labels))
     elif task == 'sciq':
         choices = ['A', 'B', 'C', 'D']
         contexts = examples['question']
-        endings = zip(examples['distractor1'], examples['distractor2'], examples['distractor3'], examples['correct_answer'])
+        endings = list(zip(examples['distractor1'], examples['distractor2'], examples['distractor3'], examples['correct_answer']))
         labels = []
     elif task == 'mnli':
         choices = [
@@ -166,11 +180,17 @@ def convert_examples_to_text_to_text(
         contexts = examples['premise']
         endings = examples['hypothesis']
         labels = examples['label']
-    elif task == 'hellaswag':
+    elif task == 'hellaswag':            
         choices = ['A', 'B', 'C', 'D']
+
+        def map_label_to_choice(str_label):
+            return choices[int(str_label)]
+
         contexts = examples['ctx']
         endings = examples['endings']
         labels = examples['label']
+        labels = list(map(map_label_to_choice, labels))
+        print(labels)
     elif task == 'yelp':
         pass
     elif task == 'piqa':
@@ -219,6 +239,10 @@ def convert_examples_to_text_to_text(
             if ex_index == 0:
                 print(processed_example)
                 print(ending)
+            print(labels)
+            if labels[ex_index] not in choices:
+                print('weird label: ' + str(labels[ex_index]))
+                continue
             label = choices.index(labels[ex_index])
         elif task == 'sciq':
             processed_example = context + '.'
@@ -230,7 +254,8 @@ def convert_examples_to_text_to_text(
                 (distractor3, 'incorrect'),
                 (correct_answer, 'correct'),
             ]
-            for choice, (option, status) in zip(choices, random.shuffle(options)):
+            random.shuffle(options)
+            for choice, (option, status) in zip(choices, options):
                 ending += '\n(' + choice + '): ' + option + ' '
                 if status == 'correct':
                     labels.append(choice)
