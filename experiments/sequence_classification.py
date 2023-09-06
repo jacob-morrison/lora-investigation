@@ -174,9 +174,9 @@ def main():
 		'sciq': 4,
 		'hellaswag': 4,
 		'mnli': 3,
-		'yelp': -1,
-		'mathqa': -1,
-		'piqa': -1,
+		'yelp': 2,
+		'mathqa': 5,
+		'piqa': 2,
 	}
 
 	# Load pretrained model and tokenizer

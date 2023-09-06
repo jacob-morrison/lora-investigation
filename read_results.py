@@ -69,6 +69,23 @@ def create_data_frame(data):
 
 
     pprint(max_scores)
+    print()
+
+    for model in max_scores:
+        for method in max_scores[model]:
+            if max_scores[model][method]['best learning rate'] == max_scores[model][method]['lowest learning rate']: 
+                print('Best matches lowest LR:')
+                print(model)
+                print(method)
+                print(max_scores[model][method])
+                print()
+            elif max_scores[model][method]['best learning rate'] == max_scores[model][method]['highest learning rate']:
+                print('Best matches highest LR:')
+                print(model)
+                print(method)
+                print(max_scores[model][method])
+                print()
+
     # flatten by building a list of maps, model + method + rank (if applicable) + LR + seed
     return pd.DataFrame(blobs)
 

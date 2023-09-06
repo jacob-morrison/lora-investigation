@@ -33,11 +33,11 @@ seeds = [
 experiments = [
     # 'case-hold',
     # 'qnli',
-    'arc-easy',
-    'arc-challenge',
-    'sciq',
-    'mnli',
-    # 'hellaswag',
+    # 'arc-easy',
+    # 'arc-challenge',
+    # 'sciq',
+    # 'mnli',
+    'hellaswag',
     # 'yelp',
     # 'piqa',
     # 'mathqa',
@@ -173,8 +173,8 @@ methods = [
     # 'lora_1',
     # 'lora_2',
     # 'lora_4',
-    # 'lora_8',
-    # 'lora_16',
+    # # 'lora_8',
+    # # 'lora_16',
     # 'lora_32',
     # 'lora_64',
     
@@ -228,6 +228,9 @@ for experiment in experiments:
                     d['tasks'][0]['envVars'][5]['value'] = model # MODEL
                     d['tasks'][0]['envVars'][10]['value'] = experiment # TASK
                     d['tasks'][0]['resources']['gpuCount'] = num_gpus
+                    if experiment in ['hellaswag', 'yelp', 'mathqa', 'piqa']:
+                        d['tasks'][0]['arguments'].remove('--do_pred')
+
                     for i in range(len(d['tasks'][0]['arguments'])):
                         if '$EXPERIMENT' in d['tasks'][0]['arguments'][i]:
                             if experiment == 'squad':

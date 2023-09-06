@@ -1,0 +1,24 @@
+{description: hellaswag-microsoft-deberta-v3-xsmall-lora_3075-lr_1e-5-seed_2, tasks: [
+    {arguments: [accelerate, launch, experiments/sequence_classification.py, --task_name,
+        hellaswag, --model_name_or_path, microsoft/deberta-v3-xsmall, --output_dir,
+        /results/, --do_train, --do_eval, '', --max_seq_length, '512', --use_lora,
+        'True', --lora_rank, '3075', --save_total_limit, '1', --load_best_model_at_end,
+        --metric_for_best_model, accuracy, --greater_is_better, 'True', --evaluation_strategy,
+        steps, --eval_steps, '1250', --save_strategy, steps, --save_steps, '1250',
+        --max_steps, '18750', --learning_rate, 1e-5, --per_device_train_batch_size,
+        '8', --per_device_eval_batch_size, '8', --seed, '1', --gradient_accumulation_steps,
+        '1', --dataloader_pin_memory, 'False'], command: [bash, /gantry/entrypoint.sh],
+      constraints: {cluster: [ai2/allennlp-elanding-a100-40g, ai2/allennlp-cirrascale,
+          ai2/climate-cirrascale, ai2/general-cirrascale, ai2/general-cirrascale-a100-80g-ib,
+          ai2/general-cirrascale-a5000, ai2/aristo-cirrascale, ai2/aristo-elanding-a6000,
+          ai2/mosaic-cirrascale, ai2/mosaic-cirrascale-a100, ai2/mosaic-elanding-rtx8000,
+          ai2/s2-cirrascale, ai2/s2-elanding]}, context: {priority: preemptible},
+      datasets: [{mountPath: /gantry, source: {beaker: 01H5B0SAY5E4KKEXX71RN079Q6}}],
+      envVars: [{name: GANTRY_VERSION, value: 0.17.0}, {name: GITHUB_REPO, value: jacob-morrison/lora-investigation},
+        {name: GIT_REF, value: 205737497bdfb50b192ec15c75439d0b52d0ff40}, {name: PYTHON_VERSION,
+          value: '3.9'}, {name: PIP_REQUIREMENTS_FILE, value: requirements.txt}, {
+          name: MODEL, value: microsoft/deberta-v3-xsmall}, {name: METHOD, value: LoRA},
+        {name: RANK, value: '3075'}, {name: SEED, value: 2}, {name: LEARNING_RATE,
+          value: 1e-5}, {name: TASK, value: hellaswag}], image: {beaker: ai2/pytorch1.13.0-cuda11.6-python3.9},
+      name: hellaswag-microsoft-deberta-v3-xsmall-lora_3075-lr_1e-5-seed_2, resources: {
+        gpuCount: 1}, result: {path: /results}}], version: v2}

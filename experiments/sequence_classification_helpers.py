@@ -69,7 +69,7 @@ if is_torch_available():
                 dataset = datasets.load_dataset("multi_nli")
             elif task == 'hellaswag': # no test labels
                 dataset = datasets.load_dataset("hellaswag")
-            elif task == 'yelp': # no validation
+            elif task == 'yelp': # no validation, limit dataset size
                 dataset = datasets.load_dataset("yelp_polarity")
             elif task == 'mathqa': # no test labels
                 dataset = datasets.load_dataset("math_qa")
@@ -82,6 +82,11 @@ if is_torch_available():
             if mode == Split.dev:
                 if task == 'mnli':
                     examples = dataset['validation_matched']
+                elif task == 'yelp':
+                    if max_samples is not None:
+                        examples = dataset['test']
+                    else:
+                        examples = dataset['test'][:10000]
                 else:
                     examples = dataset['validation']
             elif mode == Split.test:
@@ -192,11 +197,24 @@ def convert_examples_to_text_to_text(
         labels = list(map(map_label_to_choice, labels))
         print(labels)
     elif task == 'yelp':
-        pass
+        contexts = examples['text']
+        labels = examples['label']
     elif task == 'piqa':
-        pass
+        choices = ['A', 'B']
+        contexts = examples['goal']
+        endings = list(zip(examples['sol1'], examples['sol2']))
+        labels = examples['label']
     elif task == 'mathqa':
-        pass
+        choices = ['A', 'B', 'C', 'D', 'E']
+        contexts = examples['Problem']
+        endings = examples['options']
+        labels = examples['correct']
+
+        def switch_to_numbers(label):
+            label_map = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4}
+            return label_map[label]
+
+        labels = list(map(switch_to_numbers, labels))
     else:
         print('invalid task: ' + task)
     
@@ -285,11 +303,35 @@ def convert_examples_to_text_to_text(
                 print(ending)
             label = labels[ex_index]
         elif task == 'yelp':
-            pass
+            processed_example = context + '.'
+            ending = ''
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+            label = labels[ex_index]
         elif task == 'piqa':
-            pass
+            processed_example = context + '.'
+            ending = ' '
+            for choice, option in zip(choices, endings[ex_index]):
+                ending += '\n(' + choice + '): ' + option + ' '
+
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+            label = labels[ex_index]
         elif task == 'mathqa':
-            pass
+            processed_example = context
+            ending = ' '
+            for choice, option in zip(choices, ending.split(',')):
+                ending += '\n(' + choice + '): ' + option.split(')')[-1].strip() + ' '
+
+            ending += '\nOutput: '
+            if ex_index == 0:
+                print(processed_example)
+                print(ending)
+
+            label = labels[ex_index]
         else:
             print('invalid task: ' + task)
     
@@ -300,6 +342,7 @@ def convert_examples_to_text_to_text(
         else:
             labels_list.append(torch.tensor(int(label)))
 
+    # if len(input_endings[0]) > 0:
     model_inputs = tokenizer(
         processed_examples,
         input_endings,
@@ -309,6 +352,15 @@ def convert_examples_to_text_to_text(
         truncation=True,
         return_tensors="pt",
     )
+    # else:
+    #     model_inputs = tokenizer(
+    #         processed_examples,
+    #         add_special_tokens=True,
+    #         max_length=max_length,
+    #         padding="max_length",
+    #         truncation=True,
+    #         return_tensors="pt",
+    #     )
     model_inputs["labels"] = labels_list
 
     outputs = []
