@@ -6,6 +6,8 @@ from datetime import date
 import time
 import os
 from math import ceil
+from read_results import get_data
+
 
 today = date.today().strftime("%m%d%Y")
 
@@ -32,15 +34,18 @@ seeds = [
 
 experiments = [
     # 'case-hold',
-    # 'qnli',
+
+    'qnli',
     # 'arc-easy',
     # 'arc-challenge',
     # 'sciq',
     # 'mnli',
-    'hellaswag',
+    # 'hellaswag',
     # 'yelp',
     # 'piqa',
     # 'mathqa',
+
+
     # 'squad',
 ]
 
@@ -78,8 +83,8 @@ models = {
 
 
     ### round 1 ###
-    'microsoft/deberta-v3-xsmall': 1,
-    # 'microsoft/deberta-v3-small': 1,
+    # 'microsoft/deberta-v3-xsmall': 1,
+    'microsoft/deberta-v3-small': 1,
     # 'microsoft/deberta-v3-base': 1,
 
     ### round 2 ###
@@ -170,13 +175,13 @@ LoRA_ranks = {
 
 methods = [
     'full_finetuning',
-    # 'lora_1',
-    # 'lora_2',
-    # 'lora_4',
-    # # 'lora_8',
-    # # 'lora_16',
-    # 'lora_32',
-    # 'lora_64',
+    'lora_1',
+    'lora_2',
+    'lora_4',
+    'lora_8',
+    'lora_16',
+    'lora_32',
+    'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -191,13 +196,15 @@ coefficients = [
     0.6,
     0.8
 ]
+
+_, max_scores = get_data('case-hold')
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    # if LoRA_ranks[model] != 1:
-    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-    #     for coefficient in coefficients:
-    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    if LoRA_ranks[model] != 1:
+        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+        for coefficient in coefficients:
+            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:
@@ -209,6 +216,13 @@ for experiment in experiments:
         for seed in seeds:
             for learning_rate in learning_rates:
                 for method in methods + model_specific_lora_ranks[model]:
+                    print(learning_rate)
+                    if method == 'full_finetuning':
+                        learning_rate = max_scores[model]['Full Finetuning']['best learning rate']
+                    else:
+                        learning_rate = max_scores[model]['LoRA ' + method.split('_')[-1]]['best learning rate']
+                    print(learning_rate)
+
                     if model in xl_models:
                         batch_size_constant = xl_models[model]
                     else:

@@ -6,7 +6,7 @@ TASK = 'case-hold'
 # MODEL = 'microsoft/deberta-v3-base'
 MODEL = 'microsoft/deberta-v3-large'
 
-data = get_data(TASK)
+data, _ = get_data(TASK)
 
 # TODO: plots to make for each model
 # 1. Accuracy as LoRA rank changes

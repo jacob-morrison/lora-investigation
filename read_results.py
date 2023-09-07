@@ -87,7 +87,7 @@ def create_data_frame(data):
                 print()
 
     # flatten by building a list of maps, model + method + rank (if applicable) + LR + seed
-    return pd.DataFrame(blobs)
+    return pd.DataFrame(blobs), max_scores
 
 def get_data(task):
     return create_data_frame(read_results_file(task))
