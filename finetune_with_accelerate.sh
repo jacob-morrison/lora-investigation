@@ -46,7 +46,7 @@ accelerate launch \
     --num_machines 1 \
     --num_processes 8 \
     experiments/sequence_classification.py \
-    --task_name case-hold --model_name_or_path /net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B \
+    --task_name case-hold --model_name_or_path meta-llama/Llama-2-7b-hf \
     --output_dir ../results/ --do_train --do_eval --do_predict --max_seq_length 1024 \
     --use_lora True --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
     --metric_for_best_model accuracy --greater_is_better True --evaluation_strategy steps \
