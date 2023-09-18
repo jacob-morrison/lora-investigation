@@ -36,14 +36,14 @@ experiments = [
     # 'case-hold',
 
     'qnli',
-    # 'arc-easy',
-    # 'arc-challenge',
-    # 'sciq',
-    # 'mnli',
-    # 'hellaswag',
-    # 'yelp',
-    # 'piqa',
-    # 'mathqa',
+    'arc-easy',
+    'arc-challenge',
+    'sciq',
+    'mnli',
+    'hellaswag',
+    'yelp',
+    'piqa',
+    'mathqa',
 
 
     # 'squad',
@@ -59,10 +59,10 @@ learning_rates = [
     # '5e-4',
     # '1e-4',
     # '5e-5',
-    '1e-5',
+    # '1e-5',
     # '5e-6',
     # '1e-6',
-    # '5e-7',
+    '5e-7',
 ]
 
 models = {
@@ -78,52 +78,40 @@ models = {
     # 'google/t5-v1_1-xl': 4,
     # 'google/t5-v1_1-xxl': 8,
 
-
-
-
-
-    ### round 1 ###
-    # 'microsoft/deberta-v3-xsmall': 1,
-    'microsoft/deberta-v3-small': 1,
+    # not using these anymore either
+    # 'microsoft/deberta-v3-small': 1,
     # 'microsoft/deberta-v3-base': 1,
-
-    ### round 2 ###
-    # 'google/t5-small-lm-adapt': 1,
-    # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
-    # 'gpt2': 1,
-
-    ### round 3 ###
-    # 'microsoft/deberta-v3-large': 2,
     # 'gpt2-medium': 2,
     # 'google/t5-base-lm-adapt': 2,
     # 'jacobmorrison/tk-instruct-base-lora-experiments': 2,
-
-    ### round 4 ###
     # 'microsoft/deberta-v2-xlarge': 4,
-
-    # TODO: next for % lora ranks
-    # 'google/t5-large-lm-adapt': 4,
-    # 'gpt2-large': 4,
-    # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
-
-
-    ## TODO: still do:     'lora_1','lora_2','lora_4','lora_16','lora_32','lora_64',
-    ### round 5 ###
     # 'gpt2-xl': 4,
+    # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/13B': 8,
+    # 'decapoda-research/llama-7b-hf': 8,
+    # 'jacobmorrison/tk-instruct-xl-lora-experiments': 4,
+    # 'google/t5-xl-lm-adapt': 4,
+
+
+    ### encoder only ###
+    # 'microsoft/deberta-v3-xsmall': 1,
+    'microsoft/deberta-v3-large': 2,
     # 'microsoft/deberta-v2-xxlarge': 4,
 
-    ### round 6 ###
-    # 'google/t5-xl-lm-adapt': 4,
-    # 'jacobmorrison/tk-instruct-xl-lora-experiments': 4,
+    ### decoder only ###
+    # 'gpt2': 1,
+    'gpt2-large': 4,
+    # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B': 8, # probably use llama 2 instead?
 
-    # TODO: decide # of GPUs for these ones
-    ### round 7 ###
+    ### encoder/decoder ###
+    ### single task ###
+    # 'google/t5-small-lm-adapt': 1,
+    # 'google/t5-large-lm-adapt': 4,
     # 'google/t5-xxl-lm-adapt': 8,
-    # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
-    # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B': 8,
-    # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/13B': 8,
 
-    # 'decapoda-research/llama-7b-hf': 8,
+    ### multi task ###
+    # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+    # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
+    # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
 }
     
 xl_models = {
@@ -174,14 +162,14 @@ LoRA_ranks = {
 }
 
 methods = [
-    'full_finetuning',
-    'lora_1',
-    'lora_2',
-    'lora_4',
+    # 'full_finetuning',
+    # 'lora_1',
+    # 'lora_2',
+    # 'lora_4',
     'lora_8',
-    'lora_16',
-    'lora_32',
-    'lora_64',
+    # 'lora_16',
+    # 'lora_32',
+    # 'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -201,10 +189,10 @@ _, max_scores = get_data('case-hold')
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    if LoRA_ranks[model] != 1:
-        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-        for coefficient in coefficients:
-            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    # if LoRA_ranks[model] != 1:
+    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+    #     for coefficient in coefficients:
+    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:
@@ -242,7 +230,7 @@ for experiment in experiments:
                     d['tasks'][0]['envVars'][5]['value'] = model # MODEL
                     d['tasks'][0]['envVars'][10]['value'] = experiment # TASK
                     d['tasks'][0]['resources']['gpuCount'] = num_gpus
-                    if experiment in ['hellaswag', 'yelp', 'mathqa', 'piqa']:
+                    if experiment in ['hellaswag', 'yelp', 'mathqa', 'piqa', 'qnli']:
                         d['tasks'][0]['arguments'].remove('--do_pred')
 
                     for i in range(len(d['tasks'][0]['arguments'])):

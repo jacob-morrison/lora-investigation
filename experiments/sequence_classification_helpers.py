@@ -57,7 +57,7 @@ if is_torch_available():
         ):
             if task == 'case-hold':
                 dataset = datasets.load_dataset('lex_glue', 'case_hold')
-            elif task == 'qnli':
+            elif task == 'qnli': # no test labels
                 dataset = datasets.load_dataset('glue', 'qnli')    
             elif task == 'arc-easy':
                 dataset = datasets.load_dataset("ai2_arc", 'ARC-Easy')
