@@ -20,7 +20,7 @@ from tqdm.auto import tqdm
 import transformers
 from transformers import (
     AutoConfig,
-    AutoModelForCausalLM,
+    AutoModelForSequenceClassification,
     AutoTokenizer,
     LlamaTokenizer,
     LlamaTokenizerFast,
@@ -33,6 +33,7 @@ from transformers import (
     BitsAndBytesConfig,
 )
 from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training
+from sequence_classification_helpers import Split, T2TMultipleChoiceDataset
 
 logger = get_logger(__name__)
 
@@ -437,36 +438,17 @@ def main():
         )
 
     if args.model_name_or_path:
-        if args.use_qlora:
-            bnb_config = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_use_double_quant=True,
-                bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=torch.bfloat16,
-            )
-            device_index = accelerator.process_index
-            device_map = {"": device_index} # force data-parallel training.
-            model = AutoModelForCausalLM.from_pretrained(
-                args.model_name_or_path,
-                from_tf=bool(".ckpt" in args.model_name_or_path),
-                config=config,
-                load_in_4bit=True,
-                quantization_config=bnb_config,
-                device_map=device_map,
-                torch_dtype=torch.bfloat16,
-            )
-        else:
-            device_index = accelerator.process_index
-            device_map = {"": device_index} # force data-parallel training.
-            model = AutoModelForCausalLM.from_pretrained(
-                args.model_name_or_path,
-                from_tf=bool(".ckpt" in args.model_name_or_path),
-                config=config,
-                device_map=device_map,
-            )
+        device_index = accelerator.process_index
+        device_map = {"": device_index} # force data-parallel training.
+        model = AutoModelForSequenceClassification.from_pretrained(
+            args.model_name_or_path,
+            from_tf=bool(".ckpt" in args.model_name_or_path),
+            config=config,
+            device_map=device_map,
+        )
     else:
         logger.info("Training new model from scratch")
-        model = AutoModelForCausalLM.from_config(config)
+        model = AutoModelForSequenceClassification.from_config(config)
 
 
     # no default pad token for llama!
@@ -494,11 +476,9 @@ def main():
         model.resize_token_embeddings(len(tokenizer))
 
     if args.use_lora:
-        if args.use_qlora:
-            model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=args.gradient_checkpointing)
         logger.info("Initializing LORA model...")
         peft_config = LoraConfig(
-            task_type=TaskType.CAUSAL_LM, 
+            task_type=TaskType.SEQ_CLS, 
             inference_mode=False, 
             r=args.lora_rank, 
             lora_alpha=args.lora_alpha, 
@@ -513,34 +493,121 @@ def main():
         model.print_trainable_parameters()
 
     # Preprocessing the datasets.
-    if "prompt" in raw_datasets["train"].column_names and "completion" in raw_datasets["train"].column_names:
-        encode_function = partial(
-            encode_with_prompt_completion_format,
-            tokenizer=tokenizer,
-            max_seq_length=args.max_seq_length,
-        )
-    elif "messages" in raw_datasets["train"].column_names:
-        encode_function = partial(
-            encode_with_messages_format,
-            tokenizer=tokenizer,
-            max_seq_length=args.max_seq_length,
-        )
-    else:
-        raise ValueError("You need to have either 'prompt'&'completion' or 'messages' in your column names.")
+    # if "prompt" in raw_datasets["train"].column_names and "completion" in raw_datasets["train"].column_names:
+    #     encode_function = partial(
+    #         encode_with_prompt_completion_format,
+    #         tokenizer=tokenizer,
+    #         max_seq_length=args.max_seq_length,
+    #     )
+    # elif "messages" in raw_datasets["train"].column_names:
+    #     encode_function = partial(
+    #         encode_with_messages_format,
+    #         tokenizer=tokenizer,
+    #         max_seq_length=args.max_seq_length,
+    #     )
+    # else:
+    #     raise ValueError("You need to have either 'prompt'&'completion' or 'messages' in your column names.")
 
-    with accelerator.main_process_first():
-        lm_datasets = raw_datasets.map(
-            encode_function,
-            batched=False,
-            num_proc=args.preprocessing_num_workers,
-            load_from_cache_file=not args.overwrite_cache,
-            remove_columns=[name for name in raw_datasets["train"].column_names if name not in ["input_ids", "labels", "attention_mask"]],
-            desc="Tokenizing and reformatting instruction data",
-        )
-        lm_datasets.set_format(type="pt")
-        lm_datasets = lm_datasets.filter(lambda example: (example['labels'] != -100).any())
+    # with accelerator.main_process_first():
+    #     lm_datasets = raw_datasets.map(
+    #         encode_function,
+    #         batched=False,
+    #         num_proc=args.preprocessing_num_workers,
+    #         load_from_cache_file=not args.overwrite_cache,
+    #         remove_columns=[name for name in raw_datasets["train"].column_names if name not in ["input_ids", "labels", "attention_mask"]],
+    #         desc="Tokenizing and reformatting instruction data",
+    #     )
+    #     lm_datasets.set_format(type="pt")
+    #     lm_datasets = lm_datasets.filter(lambda example: (example['labels'] != -100).any())
+    train_dataset = None
+    eval_dataset = None
 
-    train_dataset = lm_datasets["train"]
+    if args.do_train:
+        if config.model_type == 't5':
+            train_dataset = \
+                T2TMultipleChoiceDataset(
+                    tokenizer=tokenizer,
+                    task=args.dataset_name,
+                    max_seq_length=args.max_seq_length,
+                    overwrite_cache=args.overwrite_cache,
+                    mode=Split.train,
+                    text_to_text=True,
+                    max_samples=args.max_train_samples,
+                )
+        elif config.model_type == 'llama':
+            train_dataset = \
+                T2TMultipleChoiceDataset(
+                    tokenizer=tokenizer,
+                    task=args.dataset_name,
+                    max_seq_length=args.max_seq_length,
+                    overwrite_cache=args.overwrite_cache,
+                    mode=Split.train,
+                    text_to_text=False,
+                    max_samples=args.max_train_samples,
+                )
+        else:
+            print('This is broken')
+
+    # If do_eval or do_predict passed, eval_dataset by default loads dev split from file named dev.csv in data directory
+    if args.do_eval:
+        if config.model_type == 't5':
+            eval_dataset = \
+                T2TMultipleChoiceDataset(
+                    tokenizer=tokenizer,
+                    task=args.dataset_name,
+                    max_seq_length=args.max_seq_length,
+                    overwrite_cache=args.overwrite_cache,
+                    mode=Split.dev,
+                    text_to_text=True,
+                    max_samples=args.max_eval_samples,
+                )
+        elif config.model_type == 'llama':
+            eval_dataset = \
+                T2TMultipleChoiceDataset(
+                    tokenizer=tokenizer,
+                    task=args.dataset_name,
+                    max_seq_length=args.max_seq_length,
+                    overwrite_cache=args.overwrite_cache,
+                    mode=Split.dev,
+                    text_to_text=False,
+                    max_samples=args.max_eval_samples,
+                )
+        else:
+            print('This is broken')
+
+    if args.do_predict:
+        if config.model_type == 't5':
+            predict_dataset = \
+                T2TMultipleChoiceDataset(
+                    tokenizer=tokenizer,
+                    task=args.dataset_name,
+                    max_seq_length=args.max_seq_length,
+                    overwrite_cache=args.overwrite_cache,
+                    mode=Split.test,
+                    text_to_text=True,
+                    max_samples=args.max_predict_samples,
+                )
+        elif config.model_type == 'llama':
+            predict_dataset = \
+                T2TMultipleChoiceDataset(
+                    tokenizer=tokenizer,
+                    task=args.dataset_name,
+                    max_seq_length=args.max_seq_length,
+                    overwrite_cache=args.overwrite_cache,
+                    mode=Split.test,
+                    text_to_text=False,
+                    max_samples=args.max_predict_samples,
+                )
+        else:
+            print('This is broken')
+            
+    print('args')
+    print(args)
+    print(args)
+    print(args)
+    print(train_dataset)
+
+    # train_dataset = lm_datasets["train"]
 
     # Log a few random samples from the training set:
     for index in random.sample(range(len(train_dataset)), 3):
@@ -567,16 +634,7 @@ def main():
             "weight_decay": 0.0,
         },
     ]
-    if args.use_qlora:
-        from bitsandbytes.optim import AdamW
-        optimizer = AdamW(
-            optimizer_grouped_parameters,
-            lr=args.learning_rate,
-            optim_bits=8 if args.use_8bit_optimizer else 32,
-            is_paged=True
-        )
-    else:
-        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
+    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
 
     # Scheduler and math around the number of training steps.
     overrode_max_train_steps = False
