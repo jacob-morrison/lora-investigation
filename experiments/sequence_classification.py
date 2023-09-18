@@ -236,6 +236,7 @@ def main():
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
             cache_dir=model_args.cache_dir,
+	    	token='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',
 		)
 
     # resize embeddings if needed (e.g. for LlamaTokenizer)
