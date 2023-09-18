@@ -53,6 +53,5 @@ accelerate launch \
     --eval_steps 1250 --save_strategy steps --save_steps 1250 \
     --max_steps 18750 --learning_rate 1e-4 --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 8 --seed 1 --gradient_accumulation_steps 1 \
-    --use_flash_attn \
     --max_eval_samples 10 --max_train_samples 10 --max_predict_samples 10 \
     --dataloader_pin_memory False
