@@ -185,6 +185,7 @@ def main():
 		num_labels=num_classes[data_args.task_name],
 		finetuning_task=data_args.task_name,
 		cache_dir=model_args.cache_dir,
+		token='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',
 	)
 
 	print('num classes: ' + str(num_classes[data_args.task_name]))
@@ -199,6 +200,7 @@ def main():
 		cache_dir=model_args.cache_dir,
 		# Default fast tokenizer is buggy on CaseHOLD task, switch to legacy tokenizer
 		use_fast=data_args.task_name != 'case-hold', # True,
+		token='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',
 	)
 	if 'gpt2' in model_args.model_name_or_path:
 		tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
