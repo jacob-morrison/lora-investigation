@@ -55,7 +55,7 @@ accelerate launch \
     --per_device_eval_batch_size 8 --seed 1 --gradient_accumulation_steps 1 \
     --max_eval_samples 10 --max_train_samples 10 --max_predict_samples 10 \
     --use_flash_attn True \
-    --gradient_checkpointing False \
+    --gradient_checkpointing True \
     --dataloader_pin_memory False
 
 # accelerate launch \
