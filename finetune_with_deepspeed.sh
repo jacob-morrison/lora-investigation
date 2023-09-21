@@ -8,7 +8,6 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 deepspeed experiments/sequence_classification.py \
     --deepspeed ds_configs/stage3_no_offloading.conf \
     --task_name case-hold --model_name_or_path /net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B \
-    --use_fast_tokenizer False \
     --output_dir ../results/ --do_train --do_eval --do_predict --max_seq_length 1024 \
     --use_lora False --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
     --metric_for_best_model accuracy --greater_is_better True --evaluation_strategy steps \
