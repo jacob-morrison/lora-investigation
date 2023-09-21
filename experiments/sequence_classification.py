@@ -13,6 +13,7 @@ from typing import Optional
 import numpy as np
 import random
 
+import torch
 import transformers
 from transformers.trainer_utils import get_last_checkpoint
 from transformers import (
@@ -233,13 +234,23 @@ def main():
 	print(config.model_type)
 	if config.model_type in sequence_classification_models:
 		task_type = TaskType.SEQ_CLS
-		model = AutoModelForSequenceClassification.from_pretrained(
-            model_args.model_name_or_path,
-            from_tf=bool(".ckpt" in model_args.model_name_or_path),
-            config=config,
-            cache_dir=model_args.cache_dir,
-	    	token='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',
-		)
+		if config.model_type == 'llama':
+			model = AutoModelForSequenceClassification.from_pretrained(
+				model_args.model_name_or_path,
+				from_tf=bool(".ckpt" in model_args.model_name_or_path),
+				config=config,
+				cache_dir=model_args.cache_dir,
+				token='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',
+				torch_dtype=torch.bfloat16,
+			)
+		else:
+			model = AutoModelForSequenceClassification.from_pretrained(
+				model_args.model_name_or_path,
+				from_tf=bool(".ckpt" in model_args.model_name_or_path),
+				config=config,
+				cache_dir=model_args.cache_dir,
+				token='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',
+			)
 
     # resize embeddings if needed (e.g. for LlamaTokenizer)
 	embedding_size = model.get_input_embeddings().weight.shape[0]
