@@ -452,6 +452,8 @@ def main():
 		elif last_checkpoint is not None:
 			checkpoint = last_checkpoint
 		print('model here')
+		print(peft_config)
+		print(config)
 		print(model)
 		trainer.train(
 			resume_from_checkpoint=checkpoint
