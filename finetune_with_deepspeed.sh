@@ -5,7 +5,14 @@ TOTAL_BATCH_SIZE=128
 GRADIENT_ACC_STEPS=$(($TOTAL_BATCH_SIZE/$NUM_GPUS/$BATCH_SIZE_PER_GPU))
 echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_GPU batch size per GPU, $GRADIENT_ACC_STEPS gradient accumulation steps"
 
-deepspeed experiments/sequence_classification.py \
+# deepspeed \
+accelerate launch \
+    --mixed_precision bf16 \
+    --num_machines 1 \
+    --num_processes 8 \
+    --use_deepspeed \
+    --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
+    experiments/sequence_classification.py \
     --deepspeed ds_configs/stage3_no_offloading.conf \
     --task_name case-hold --model_name_or_path /net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B \
     --output_dir ../results/ --do_train --do_eval --do_predict --max_seq_length 1024 \
