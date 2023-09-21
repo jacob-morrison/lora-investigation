@@ -56,6 +56,7 @@ accelerate launch \
     --max_eval_samples 10 --max_train_samples 10 --max_predict_samples 10 \
     --use_flash_attn True \
     --gradient_checkpointing True \
+    --bf16 True \
     --dataloader_pin_memory False
 
 # accelerate launch \
