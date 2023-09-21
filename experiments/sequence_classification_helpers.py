@@ -374,9 +374,6 @@ def convert_examples_to_text_to_text(
         ):
             if 0 in attention_mask:
                 padded += 1
-            # elif mode == Split.train:
-            #     print('skipping train example')
-            #     continue
             outputs.append({
                 'input_ids': input_ids,
                 'attention_mask': attention_mask,
