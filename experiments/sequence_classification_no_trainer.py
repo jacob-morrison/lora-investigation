@@ -124,6 +124,18 @@ def parse_args():
         help="Batch size (per device) for the training dataloader.",
     )
     parser.add_argument(
+        "--per_device_eval_batch_size",
+        type=int,
+        default=8,
+        help="Batch size (per device) for the eval dataloader.",
+    )
+    parser.add_argument(
+        "--per_device_predict_batch_size",
+        type=int,
+        default=8,
+        help="Batch size (per device) for the predict dataloader.",
+    )
+    parser.add_argument(
         "--learning_rate",
         type=float,
         default=5e-5,
@@ -621,6 +633,20 @@ def main():
         batch_size=args.per_device_train_batch_size
     )
 
+    eval_dataloader = DataLoader(
+        eval_dataset, 
+        shuffle=True, 
+        collate_fn=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding="longest"),
+        batch_size=args.per_device_eval_batch_size
+    )
+
+    predict_dataloader = DataLoader(
+        predict_dataset, 
+        shuffle=True, 
+        collate_fn=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding="longest"),
+        batch_size=args.per_device_predict_batch_size
+    )
+
     # Optimizer
     # Split weights in two groups, one with weight decay and the other not.
     no_decay = ["bias", "layer_norm.weight"]
@@ -640,8 +666,7 @@ def main():
     overrode_max_train_steps = False
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.gradient_accumulation_steps)
     if args.max_train_steps is None:
-        args.max_train_steps = args.num_train_epochs * num_update_steps_per_epoch
-        overrode_max_train_steps = True
+        print('this should not happen!!!!')
 
     # Create the learning rate scheduler.
     # Note: the current accelerator.step() calls the .step() of the real scheduler for the `num_processes` times. This is because they assume 
@@ -650,7 +675,7 @@ def main():
     # number of updates in the end matches the num_training_steps here.
     # Here we need to set the num_training_steps to either using the entire training set (when epochs is specified) or we need to multiply the 
     # num_training_steps by num_processes so that the total number of updates matches the num_training_steps.
-    num_training_steps_for_scheduler = args.max_train_steps if overrode_max_train_steps else args.max_train_steps * accelerator.num_processes
+    num_training_steps_for_scheduler = args.max_train_steps = args.max_train_steps * accelerator.num_processes
     lr_scheduler = get_scheduler(
         name=args.lr_scheduler_type,
         optimizer=optimizer,
@@ -663,12 +688,12 @@ def main():
         model, optimizer, train_dataloader, lr_scheduler
     )
 
-    # We need to recalculate our total training steps as the size of the training dataloader may have changed.
-    num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.gradient_accumulation_steps)
-    if overrode_max_train_steps:
-        args.max_train_steps = args.num_train_epochs * num_update_steps_per_epoch
-    # Afterwards we recalculate our number of training epochs
-    args.num_train_epochs = math.ceil(args.max_train_steps / num_update_steps_per_epoch)
+    # # We need to recalculate our total training steps as the size of the training dataloader may have changed.
+    # num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.gradient_accumulation_steps)
+    # if overrode_max_train_steps:
+    #     args.max_train_steps = args.num_train_epochs * num_update_steps_per_epoch
+    # # Afterwards we recalculate our number of training epochs
+    # args.num_train_epochs = math.ceil(args.max_train_steps / num_update_steps_per_epoch)
 
     # Figure out how many steps we should save the Accelerator states
     checkpointing_steps = args.checkpointing_steps

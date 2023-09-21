@@ -36,14 +36,14 @@ experiments = [
     # 'case-hold',
 
     'qnli',
-    'arc-easy',
-    'arc-challenge',
-    'sciq',
-    'mnli',
-    'hellaswag',
-    'yelp',
-    'piqa',
-    'mathqa',
+    # 'arc-easy',
+    # 'arc-challenge',
+    # 'sciq',
+    # 'mnli',
+    # 'hellaswag',
+    # 'yelp',
+    # 'piqa',
+    # 'mathqa',
 
 
     # 'squad',
@@ -94,22 +94,22 @@ models = {
 
     ### encoder only ###
     # 'microsoft/deberta-v3-xsmall': 1,
-    'microsoft/deberta-v3-large': 2,
+    # 'microsoft/deberta-v3-large': 2,
     # 'microsoft/deberta-v2-xxlarge': 4,
 
     ### decoder only ###
-    # 'gpt2': 1,
-    'gpt2-large': 4,
+    'gpt2': 1,
+    # 'gpt2-large': 4,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B': 8, # probably use llama 2 instead?
 
     ### encoder/decoder ###
     ### single task ###
-    # 'google/t5-small-lm-adapt': 1,
+    'google/t5-small-lm-adapt': 1,
     # 'google/t5-large-lm-adapt': 4,
     # 'google/t5-xxl-lm-adapt': 8,
 
     ### multi task ###
-    # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
     # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
 }
@@ -162,14 +162,14 @@ LoRA_ranks = {
 }
 
 methods = [
-    # 'full_finetuning',
-    # 'lora_1',
-    # 'lora_2',
-    # 'lora_4',
+    'full_finetuning',
+    'lora_1',
+    'lora_2',
+    'lora_4',
     'lora_8',
-    # 'lora_16',
-    # 'lora_32',
-    # 'lora_64',
+    'lora_16',
+    'lora_32',
+    'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -189,10 +189,10 @@ _, max_scores = get_data('case-hold')
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    # if LoRA_ranks[model] != 1:
-    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-    #     for coefficient in coefficients:
-    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    if LoRA_ranks[model] != 1:
+        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+        for coefficient in coefficients:
+            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:

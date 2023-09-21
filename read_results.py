@@ -91,3 +91,132 @@ def create_data_frame(data):
 
 def get_data(task):
     return create_data_frame(read_results_file(task))
+
+tasks = [
+    'case-hold',
+    'qnli',
+    'arc-easy',
+    'arc-challenge',
+    'sciq',
+    'mnli',
+    'hellaswag',
+    'yelp',
+    'piqa',
+    'mathqa',
+
+    # 'squad',
+]
+
+methods = [
+    'Full Finetuning',
+    'LoRA 1',
+    'LoRA 2',
+    'LoRA 4',
+    'LoRA 8',
+    'LoRA 16',
+    'LoRA 32',
+    'LoRA 64',
+]
+
+models = {
+    ### encoder only ###
+    'microsoft/deberta-v3-xsmall': 1,
+    'microsoft/deberta-v3-large': 2,
+    'microsoft/deberta-v2-xxlarge': 4,
+
+    ### decoder only ###
+    'gpt2': 1,
+    'gpt2-large': 4,
+    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
+
+    ### encoder/decoder ###
+    ### single task ###
+    'google/t5-small-lm-adapt': 1,
+    'google/t5-large-lm-adapt': 4,
+    'google/t5-xxl-lm-adapt': 8,
+
+    ### multi task ###
+    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-large-lora-experiments': 4,
+    'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
+}
+
+LoRA_ranks = {
+    'microsoft/deberta-v3-xsmall': 3843, # 769, 
+    'microsoft/deberta-v3-large': 4426,
+    'microsoft/deberta-v2-xxlarge': 5314,
+
+    'gpt2': 3376,
+    'gpt2-large': 4200,
+    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
+
+    'google/t5-small-lm-adapt': 1414,
+    'google/t5-large-lm-adapt': 2548,
+    'google/t5-xxl-lm-adapt': 8,
+
+    'jacobmorrison/tk-instruct-small-lora-experiments': 1413,
+    'jacobmorrison/tk-instruct-large-lora-experiments': 2548,
+    'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
+
+}
+
+model_specific_lora_ranks = {}
+
+coefficients = [
+    0.2,
+    0.4,
+    0.6,
+    0.8
+]
+
+def transform_lora_name(method):
+    if '_' in method:
+        rank = method.split('_')[-1]
+        if rank == 'Full Finetuning':
+            return rank
+        return 'LoRA ' + rank
+    else:
+        return method
+    
+from math import ceil
+
+for model in LoRA_ranks:
+    model_specific_lora_ranks[model] = []
+    if LoRA_ranks[model] != 1:
+        for coefficient in coefficients:
+            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+
+
+max_scores = {}
+for task in tasks:
+    _, task_scores = get_data(task)
+    max_scores[task] = task_scores
+
+best_scores = {}
+for task in max_scores:
+    for model in max_scores[task]:
+        if model not in best_scores:
+            best_scores[model] = {}
+        for method in max_scores[task][model]:
+            if method not in best_scores[model]:
+                best_scores[model][method] = {}
+            best_scores[model][method][task] = max_scores[task][model][method]['best score']
+
+pprint(best_scores)
+
+# Model	Method	CaseHOLD	QNLI	ARC Easy	ARC Challenge	SciQ	MNLI	HellaSwag	Yelp	PIQA	MathQA	SQuAD
+with open('results/combined-results.csv', 'w') as f:
+    f.write('Model,Method,CaseHOLD,QNLI,ARC Easy,ARC Challenge,SciQ,MNLI,HellaSwag,Yelp,PIQA,MathQA,SQuAD\n')
+    for model in models:
+        for method in methods + model_specific_lora_ranks[model]:
+            f.write(model + ',' + transform_lora_name(method))
+            for task in tasks:
+                if model not in best_scores or \
+                    (transform_lora_name(method) not in best_scores[model] and transform_lora_name(method) in methods) or \
+                        transform_lora_name(method) not in best_scores[model] or \
+                        task not in best_scores[model][transform_lora_name(method)]:
+                    f.write(',0.0')
+                else:
+                    f.write(',' + str(best_scores[model][transform_lora_name(method)][task]))
+            f.write('\n')
