@@ -13,15 +13,16 @@ accelerate launch \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
-    --task_name case-hold --model_name_or_path google/t5-xxl-lm-adapt \
-    --output_dir ../results/ --do_train --do_eval --do_predict --max_seq_length 512 \
-    --use_lora False --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
+    --task_name case-hold --model_name_or_path /net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/13B \
+    --output_dir ../results/ --do_train --do_eval --do_predict --max_seq_length 1024 \
+    --use_lora True --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
     --metric_for_best_model accuracy --greater_is_better True --evaluation_strategy steps \
     --eval_steps 10 --save_strategy steps --save_steps 10 \
     --max_steps 50 --learning_rate 1e-4 --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 8 --seed 1 --gradient_accumulation_steps 1 \
     --max_eval_samples 10 --max_train_samples 10 --max_predict_samples 10 \
     --bf16 True \
+    --use_flash_attn True \
     --dataloader_pin_memory False
 
 # pure deepspeed
