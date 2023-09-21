@@ -19,7 +19,7 @@ accelerate launch \
     --use_lora True --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
     --metric_for_best_model accuracy --greater_is_better True --evaluation_strategy steps \
     --eval_steps 10 --save_strategy steps --save_steps 10 \
-    --max_steps 50 --learning_rate 1e-4 --per_device_train_batch_size 4 \
+    --max_steps 50 --learning_rate 1e-4 --per_device_train_batch_size 8 \
     --per_device_eval_batch_size 8 --seed 1 --gradient_accumulation_steps 1 \
     --max_eval_samples 10 --max_train_samples 10 --max_predict_samples 10 \
     --bf16 True \
