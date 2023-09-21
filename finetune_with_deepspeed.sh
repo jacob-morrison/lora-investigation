@@ -16,7 +16,7 @@ accelerate launch \
     --deepspeed ds_configs/stage3_no_offloading.conf \
     --task_name case-hold --model_name_or_path /net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B \
     --output_dir ../results/ --do_train --do_eval --do_predict --max_seq_length 1024 \
-    --use_lora False --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
+    --use_lora True --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
     --metric_for_best_model accuracy --greater_is_better True --evaluation_strategy steps \
     --eval_steps 10 --save_strategy steps --save_steps 10 \
     --max_steps 50 --learning_rate 1e-4 --per_device_train_batch_size 4 \
