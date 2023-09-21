@@ -15,11 +15,12 @@ deepspeed experiments/sequence_classification.py \
     --max_steps 50 --learning_rate 1e-4 --per_device_train_batch_size 2 \
     --per_device_eval_batch_size 8 --seed 1 --gradient_accumulation_steps 1 \
     --max_eval_samples 10 --max_train_samples 10 --max_predict_samples 10 \
-    --use_flash_attn True \
     --bf16 True \
     --dataloader_pin_memory False
 
 # /net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B # max length 1024++ # 4 train batch size 8 eval batch size
+#     --use_flash_attn True \
+
 
 # open_instruct/finetune_trainer.py \
     # --deepspeed ds_configs/stage3_no_offloading.conf \
