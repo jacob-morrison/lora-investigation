@@ -13,7 +13,6 @@ accelerate launch \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
-    --deepspeed ds_configs/stage3_no_offloading.conf \
     --task_name case-hold --model_name_or_path /net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B \
     --output_dir ../results/ --do_train --do_eval --do_predict --max_seq_length 1024 \
     --use_lora True --lora_rank 8 --save_total_limit 1 --load_best_model_at_end \
