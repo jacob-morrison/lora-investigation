@@ -188,6 +188,7 @@ def main():
 		cache_dir=model_args.cache_dir,
 		token='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',
 	)
+	config.use_cache = False
 
 	print('num classes: ' + str(num_classes[data_args.task_name]))
 
