@@ -451,6 +451,8 @@ def main():
 			checkpoint = training_args.resume_from_checkpoint
 		elif last_checkpoint is not None:
 			checkpoint = last_checkpoint
+		print('model here')
+		print(model)
 		trainer.train(
 			resume_from_checkpoint=checkpoint
 			# model_path=model_args.model_name_or_path if os.path.isdir(model_args.model_name_or_path) else None
