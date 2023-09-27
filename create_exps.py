@@ -35,10 +35,10 @@ seeds = [
 experiments = [
     # 'case-hold',
 
-    'qnli',
+    # 'qnli',
     # 'arc-easy',
     # 'arc-challenge',
-    # 'sciq',
+    'sciq',
     # 'mnli',
     # 'hellaswag',
     # 'yelp',
@@ -98,18 +98,18 @@ models = {
     # 'microsoft/deberta-v2-xxlarge': 4,
 
     ### decoder only ###
-    'gpt2': 1,
-    # 'gpt2-large': 4,
+    # 'gpt2': 1,
+    'gpt2-large': 4,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B': 8, # probably use llama 2 instead?
 
     ### encoder/decoder ###
     ### single task ###
-    'google/t5-small-lm-adapt': 1,
+    # 'google/t5-small-lm-adapt': 1,
     # 'google/t5-large-lm-adapt': 4,
     # 'google/t5-xxl-lm-adapt': 8,
 
     ### multi task ###
-    'jacobmorrison/tk-instruct-small-lora-experiments': 1,
+    # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
     # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
 }
@@ -162,11 +162,11 @@ LoRA_ranks = {
 }
 
 methods = [
-    'full_finetuning',
+    # 'full_finetuning',
     'lora_1',
     'lora_2',
     'lora_4',
-    'lora_8',
+    # 'lora_8',
     'lora_16',
     'lora_32',
     'lora_64',

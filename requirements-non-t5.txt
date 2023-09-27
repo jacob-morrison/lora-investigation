@@ -21,6 +21,7 @@
 # scipy>=1.6.3
 # sentencepiece
 peft
+transformers==4.31.0
 # protobuf==3.20.0
 # termcolor
 # jsonlines
