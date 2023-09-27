@@ -212,6 +212,7 @@ def main():
     # no default pad token for llama!
     # here we add all special tokens again, because the default ones are not in the special_tokens_map
 	if isinstance(tokenizer, LlamaTokenizer):
+		print('adding llama tokens')
 		num_added_tokens = tokenizer.add_special_tokens({
 			"bos_token": "<s>",
             "eos_token": "</s>",
