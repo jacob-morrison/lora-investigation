@@ -57,12 +57,12 @@ learning_rates = [
     # TODO: limit which we choose
     # '1e-3',
     # '5e-4',
-    # '1e-4',
+    '1e-4',
     # '5e-5',
     # '1e-5',
     # '5e-6',
     # '1e-6',
-    '5e-7',
+    # '5e-7',
 ]
 
 models = {
@@ -100,12 +100,12 @@ models = {
     ### decoder only ###
     # 'gpt2': 1,
     # 'gpt2-large': 4,
-    # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama_models/7B': 8, # probably use llama 2 instead?
+    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
 
     ### encoder/decoder ###
     ### single task ###
     # 'google/t5-small-lm-adapt': 1,
-    'google/t5-large-lm-adapt': 4,
+    # 'google/t5-large-lm-adapt': 4,
     # 'google/t5-xxl-lm-adapt': 8,
 
     ### multi task ###
@@ -151,7 +151,8 @@ LoRA_ranks = {
     'jacobmorrison/tk-instruct-large-lora-experiments': 2548,
     'jacobmorrison/tk-instruct-xl-lora-experiments': 1,
 
-    'huggyllama/llama-7b': 1,
+    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 1,
+    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/13B': 1,
 
     # Decide if we want to run these
     # 'huggyllama/llama-13b',
@@ -162,14 +163,14 @@ LoRA_ranks = {
 }
 
 methods = [
-    # 'full_finetuning',
-    'lora_1',
-    'lora_2',
-    'lora_4',
-    # 'lora_8',
-    'lora_16',
-    'lora_32',
-    'lora_64',
+    'full_finetuning',
+    # 'lora_1',
+    # 'lora_2',
+    # 'lora_4',
+    # # 'lora_8',
+    # 'lora_16',
+    # 'lora_32',
+    # 'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -189,10 +190,10 @@ _, max_scores = get_data('case-hold')
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    if LoRA_ranks[model] != 1:
-        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-        for coefficient in coefficients:
-            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    # if LoRA_ranks[model] != 1:
+    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+    #     for coefficient in coefficients:
+    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:
@@ -201,14 +202,23 @@ for experiment in experiments:
     d1 = yaml.load(default_yaml, Loader=yaml.FullLoader)
 
     for model in models:
+        if 'llama' in model:
+            with open('configs/base-config-llama.yaml', 'r') as f:
+                default_yaml = f.read()
+            d1 = yaml.load(default_yaml, Loader=yaml.FullLoader)
+        else:
+            with open('configs/base-config.yaml', 'r') as f:
+                default_yaml = f.read()
+            d1 = yaml.load(default_yaml, Loader=yaml.FullLoader)
         for seed in seeds:
             for learning_rate in learning_rates:
                 for method in methods + model_specific_lora_ranks[model]:
                     print(learning_rate)
-                    if method == 'full_finetuning':
-                        learning_rate = max_scores[model]['Full Finetuning']['best learning rate']
-                    else:
-                        learning_rate = max_scores[model]['LoRA ' + method.split('_')[-1]]['best learning rate']
+                    if model in max_scores:
+                        if method == 'full_finetuning':
+                            learning_rate = max_scores[model]['Full Finetuning']['best learning rate']
+                        else:
+                            learning_rate = max_scores[model]['LoRA ' + method.split('_')[-1]]['best learning rate']
                     print(learning_rate)
 
                     if model in xl_models:

@@ -1,0 +1,50 @@
+version: v2
+tasks:
+  - name: main
+    image:
+      beaker: jacobm/lora-instruct
+    command: [bash, /gantry/entrypoint.sh]
+    arguments: [accelerate, launch, --mixed_precision, bf16, --use_deepspeed, --deepspeed_config_file, ds_configs/stage3_no_offloading_accelerate.conf, experiments/$EXPERIMENT.py, --task_name, $TASK, --model_name_or_path, "$MODEL", --output_dir, /results/, --do_train, --do_eval, --do_pred, --max_seq_length, "$MAX_SEQ_LENGTH", --use_lora, "$USE_LORA", --lora_rank, "$LORA_RANK", --save_total_limit, "1", --load_best_model_at_end, --metric_for_best_model, accuracy, --greater_is_better, "True", --evaluation_strategy, steps, --eval_steps, "$EVAL_STEPS", --save_strategy, steps, --save_steps, "$SAVE_STEPS", --max_steps, "$MAX_STEPS", --learning_rate, "$LEARNING_RATE", --per_device_train_batch_size, "$DEVICE_TRAIN_BATCH_SIZE", --per_device_eval_batch_size, "$DEVICE_EVAL_BATCH_SIZE", --seed, "$SEED", --gradient_accumulation_steps, "1", --dataloader_pin_memory, "False", --bf16, "True", --use_flash_attn, "True"]
+    envVars:
+      - name: GANTRY_VERSION
+        value: 0.17.0
+      - name: GITHUB_REPO
+        value: jacob-morrison/lora-investigation
+      - name: GIT_REF
+        value: a4d472eb10631a6aa81fb7524d15537ec59abe31
+      - name: PYTHON_VERSION
+        value: "3.9"
+      - name: PIP_REQUIREMENTS_FILE
+        value: requirements.txt
+      - name: MODEL
+        value: placeholder
+      - name: METHOD
+        value: placeholder
+      - name: RANK
+        value: -1
+      - name: SEED
+        value: placeholder
+      - name: LEARNING_RATE
+        value: placeholder
+      - name: TASK
+        value: placeholder
+                    # Model
+                    # Size?
+                    # LoRA vs full finetuning
+                    # LoRA Rank (-1 if not using LoRA)
+                    # Seed
+                    # Learning Rate
+                    # Task
+    datasets:
+      - mountPath: /gantry
+        source:
+          beaker: 01H5B0SAY5E4KKEXX71RN079Q6
+    result:
+      path: /results
+    resources:
+      gpuCount: 8
+    context:
+      priority: high
+    constraints:
+      cluster:
+        - ai2/general-cirrascale-a100-80g-ib
