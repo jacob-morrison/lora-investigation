@@ -47,10 +47,10 @@ accelerate launch \
     --per_device_eval_batch_size 8 --seed 1 --gradient_accumulation_steps 1 \
     --max_eval_samples 10 --max_train_samples 10 --max_predict_samples 10 \
     --dataloader_pin_memory False
-    # --bf16 True \
-    # --use_flash_attn True \
+    --bf16 True \
+    --use_flash_attn True \
 
-#     --mixed_precision bf16 \
+    --mixed_precision bf16 \
 # /net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/13B 
 
 # pure deepspeed
