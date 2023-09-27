@@ -220,6 +220,9 @@ def main():
             "pad_token": "<pad>",
 		})
 		assert num_added_tokens in [0, 1], "LlamaTokenizer should only add one special token - the pad_token, or no tokens if pad token present."
+	else:
+		print('what is the tokenizer?')
+		print(tokenizer)
 	# elif isinstance(tokenizer, GPT2Tokenizer) and isinstance(model, OPTForCausalLM):
 		# num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
 
