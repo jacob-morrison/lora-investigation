@@ -24,6 +24,7 @@ from transformers import (
 	EvalPrediction,
 	HfArgumentParser,
 	LlamaTokenizer,
+	LlamaTokenizerFast,
 	Trainer,
 	Seq2SeqTrainer,
 	Seq2SeqTrainingArguments,
@@ -211,7 +212,7 @@ def main():
 
     # no default pad token for llama!
     # here we add all special tokens again, because the default ones are not in the special_tokens_map
-	if isinstance(tokenizer, LlamaTokenizer):
+	if isinstance(tokenizer, LlamaTokenizer) or isinstance(tokenizer, LlamaTokenizerFast):
 		print('adding llama tokens')
 		num_added_tokens = tokenizer.add_special_tokens({
 			"bos_token": "<s>",
