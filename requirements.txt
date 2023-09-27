@@ -11,8 +11,8 @@ scipy
 packaging
 deepspeed>=0.10.0
 accelerate
-# transformers>=4.9.0
-transformers @ git+https://github.com/huggingface/transformers@a6e6b1c622d8d08e2510a82cb6266d7b654f1cbf
+transformers>=4.33.3
+# transformers @ git+https://github.com/huggingface/transformers@a6e6b1c622d8d08e2510a82cb6266d7b654f1cbf
 scikit-learn>=0.24.1
 tqdm>=4.61.1
 numpy>=1.20.1
