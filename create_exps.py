@@ -100,7 +100,7 @@ models = {
     ### decoder only ###
     # 'gpt2': 1,
     # 'gpt2-large': 4,
-    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
+    # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
 
     ### encoder/decoder ###
     ### single task ###
@@ -110,7 +110,7 @@ models = {
 
     ### multi task ###
     # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
-    # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
+    'jacobmorrison/tk-instruct-large-lora-experiments': 4,
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
 }
     
@@ -122,36 +122,38 @@ xl_models = {
 }
 
 LoRA_ranks = {
-    'roberta-base': 3398,
-    'roberta-large': 3626,
+    # 'roberta-base': 3398,
+    # 'roberta-large': 3626,
 
-    'microsoft/deberta-base': 3776,
-    'microsoft/deberta-large': 4133,
+    # 'microsoft/deberta-base': 3776,
+    # 'microsoft/deberta-large': 4133,
 
-    'microsoft/deberta-v2-xlarge': 6016,
+    # 'microsoft/deberta-v2-xlarge': 6016,
     'microsoft/deberta-v2-xxlarge': 5314,
 
     'microsoft/deberta-v3-xsmall': 3843, # 769, 
-    'microsoft/deberta-v3-small': 7699,
-    'microsoft/deberta-v3-base': 5003,
+    # 'microsoft/deberta-v3-small': 7699,
+    # 'microsoft/deberta-v3-base': 5003,
     'microsoft/deberta-v3-large': 4426,
 
     'gpt2': 3376,
-    'gpt2-medium': 3610,
+    # 'gpt2-medium': 3610,
     'gpt2-large': 4200,
-    'gpt2-xl': 5071,
+    # 'gpt2-xl': 5071,
 
     'google/t5-small-lm-adapt': 1414,
-    'google/t5-base-lm-adapt': 2021,
+    # 'google/t5-base-lm-adapt': 2021,
     'google/t5-large-lm-adapt': 2548,
-    'google/t5-xl-lm-adapt': 1,
+    # 'google/t5-xl-lm-adapt': 1,
+    'google/t5-xxl-lm-adapt': 1,
 
     'jacobmorrison/tk-instruct-small-lora-experiments': 1413,
-    'jacobmorrison/tk-instruct-base-lora-experiments': 2021,
+    # 'jacobmorrison/tk-instruct-base-lora-experiments': 2021,
     'jacobmorrison/tk-instruct-large-lora-experiments': 2548,
-    'jacobmorrison/tk-instruct-xl-lora-experiments': 1,
+    # 'jacobmorrison/tk-instruct-xl-lora-experiments': 1,
+    'jacobmorrison/tk-instruct-xxl-lora-experiments': 1,
 
-    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 1,
+    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 12603,
     '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/13B': 1,
 
     # Decide if we want to run these
@@ -163,14 +165,14 @@ LoRA_ranks = {
 }
 
 methods = [
-    'full_finetuning',
-    # 'lora_1',
-    # 'lora_2',
-    # 'lora_4',
-    # # 'lora_8',
-    # 'lora_16',
-    # 'lora_32',
-    # 'lora_64',
+    # 'full_finetuning',
+    'lora_1',
+    'lora_2',
+    'lora_4',
+    # 'lora_8',
+    'lora_16',
+    'lora_32',
+    'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -190,10 +192,10 @@ _, max_scores = get_data('case-hold')
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    # if LoRA_ranks[model] != 1:
-    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-    #     for coefficient in coefficients:
-    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    if LoRA_ranks[model] != 1:
+        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+        for coefficient in coefficients:
+            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:
@@ -236,7 +238,7 @@ for experiment in experiments:
                     eval_steps = int(num_instances_for_eval / batch_size_constant)
 
                     d = copy.deepcopy(d1)
-                    if 't5' not in model:
+                    if 't5' not in model and 'tk' not in model:
                         d['tasks'][0]['envVars'][4]['value'] = 'requirements-non-t5.txt'
                     d['tasks'][0]['envVars'][8]['value'] = seed # SEED
                     d['tasks'][0]['envVars'][5]['value'] = model # MODEL

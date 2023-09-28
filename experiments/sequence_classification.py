@@ -262,6 +262,8 @@ def main():
 	embedding_size = model.get_input_embeddings().weight.shape[0]
 	if len(tokenizer) > embedding_size:
 		model.resize_token_embeddings(len(tokenizer))
+		config.vocab_size = len(tokenizer)
+		print('updated config')
 
 	if model_args.use_lora:
 		peft_config = LoraConfig(
