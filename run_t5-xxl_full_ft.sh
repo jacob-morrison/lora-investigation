@@ -19,7 +19,6 @@
 
 # sciq
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -38,7 +37,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -57,7 +55,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -77,7 +74,6 @@ accelerate launch \
 
 # case hold
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -96,7 +92,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -115,7 +110,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -135,7 +129,6 @@ accelerate launch \
 
 # sciq - LoRA
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -154,7 +147,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -173,7 +165,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -193,7 +184,6 @@ accelerate launch \
 
 # case hold
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -212,7 +202,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
@@ -231,7 +220,6 @@ accelerate launch \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
-    --mixed_precision bf16 \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
     experiments/sequence_classification.py \
