@@ -37,9 +37,9 @@ experiments = [
 
     # 'qnli',
     # 'arc-easy',
-    # 'arc-challenge',
-    'sciq',
-    # 'mnli',
+    'arc-challenge',
+    # 'sciq',
+    'mnli',
     # 'hellaswag',
     # 'yelp',
     # 'piqa',
@@ -94,7 +94,7 @@ models = {
 
     ### encoder only ###
     # 'microsoft/deberta-v3-xsmall': 1,
-    # 'microsoft/deberta-v3-large': 2,
+    'microsoft/deberta-v3-large': 2,
     # 'microsoft/deberta-v2-xxlarge': 4,
 
     ### decoder only ###
@@ -110,7 +110,7 @@ models = {
 
     ### multi task ###
     # 'jacobmorrison/tk-instruct-small-lora-experiments': 1,
-    'jacobmorrison/tk-instruct-large-lora-experiments': 4,
+    # 'jacobmorrison/tk-instruct-large-lora-experiments': 4,
     # 'jacobmorrison/tk-instruct-xxl-lora-experiments': 8,
 }
     
