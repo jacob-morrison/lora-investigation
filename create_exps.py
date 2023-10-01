@@ -35,8 +35,8 @@ seeds = [
 experiments = [
     # 'case-hold',
 
-    # 'qnli',
-    # 'arc-easy',
+    'qnli',
+    'arc-easy',
     'arc-challenge',
     # 'sciq',
     'mnli',
@@ -94,12 +94,12 @@ models = {
 
     ### encoder only ###
     # 'microsoft/deberta-v3-xsmall': 1,
-    'microsoft/deberta-v3-large': 2,
+    # 'microsoft/deberta-v3-large': 2,
     # 'microsoft/deberta-v2-xxlarge': 4,
 
     ### decoder only ###
     # 'gpt2': 1,
-    # 'gpt2-large': 4,
+    'gpt2-large': 4,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
 
     ### encoder/decoder ###

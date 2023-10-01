@@ -30,6 +30,8 @@ from transformers import (
 	Seq2SeqTrainingArguments,
 	set_seed,
 )
+import shutil
+import glob
 from transformers.trainer_utils import is_main_process
 from sequence_classification_helpers import Split, T2TMultipleChoiceDataset
 from sklearn.metrics import f1_score, accuracy_score
@@ -515,10 +517,12 @@ def main():
 		# 			pred_line = '\t'.join([f'{pred:.5f}' for pred in pred_list])
 		# 			writer.write(f"{index}\t{pred_line}\n")
 
-	# # Clean up checkpoints
-	# checkpoints = [filepath for filepath in glob.glob(f'{training_args.output_dir}/*/') if '/checkpoint' in filepath]
-	# for checkpoint in checkpoints:
-	# 	shutil.rmtree(checkpoint)
+	# Clean up checkpoints
+	if is_main_process(training_args.local_rank):
+		checkpoints = [filepath for filepath in glob.glob(f'{training_args.output_dir}/*/') if '/checkpoint' in filepath]
+		for checkpoint in checkpoints:
+			shutil.rmtree(checkpoint)
+
 	if is_main_process(training_args.local_rank):
 		os.rename(training_args.output_dir + 'all_results.json', training_args.output_dir + 'metrics.json')
 
