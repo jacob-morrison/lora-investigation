@@ -1,4 +1,4 @@
-# lora 8
+# lora 1
 accelerate launch \
     --mixed_precision bf16 \
     --use_deepspeed \
@@ -348,4 +348,3 @@ accelerate launch \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False --bf16 True --use_flash_attn True
-    
