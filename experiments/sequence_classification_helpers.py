@@ -75,6 +75,8 @@ if is_torch_available():
                 dataset = datasets.load_dataset("math_qa")
             elif task == 'piqa': # no test labels
                 dataset = datasets.load_dataset("piqa") 
+            elif task == 'squad': # not multiple choice, no test
+                dataset = datasets.load_dataset("squad")
             else:
                 print('invalid task: ' + task)
 

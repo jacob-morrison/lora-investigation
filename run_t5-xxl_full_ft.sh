@@ -14,7 +14,7 @@
 #     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
 #     --evaluation_strategy steps --eval_steps 10 \
 #     --save_strategy steps --save_steps 20 --max_steps 60 \
-#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
 #     --gradient_accumulation_steps 1 --dataloader_pin_memory False
 
 # # sciq
@@ -33,7 +33,7 @@
 #     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
 #     --evaluation_strategy steps --eval_steps 1250 \
 #     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
 #     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 # accelerate launch \
@@ -51,7 +51,7 @@
 #     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
 #     --evaluation_strategy steps --eval_steps 1250 \
 #     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
 #     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 # in progress on allennlp cirrascale
@@ -70,7 +70,7 @@
 #     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
 #     --evaluation_strategy steps --eval_steps 1250 \
 #     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+#     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
 #     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 # case hold
@@ -89,7 +89,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
@@ -107,7 +107,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
@@ -125,7 +125,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 # sciq - LoRA
@@ -144,7 +144,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
@@ -162,7 +162,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
@@ -180,7 +180,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 # case hold
@@ -199,7 +199,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
@@ -217,7 +217,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
 
 accelerate launch \
@@ -235,7 +235,7 @@ accelerate launch \
     --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
-    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+    --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 --dataloader_pin_memory False
 
     

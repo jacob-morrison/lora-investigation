@@ -25,9 +25,9 @@ def set_argument_value(arguments, name, value):
 
 # ---- run all experiments ---- #
 seeds = [
-    1,
+    # 1,
     2,
-    3,
+    # 3,
     # 4,
     # 5,
 ]
@@ -35,12 +35,12 @@ seeds = [
 experiments = [
     # 'case-hold',
 
-    'qnli',
-    'arc-easy',
-    'arc-challenge',
+    # 'qnli',
+    # 'arc-easy',
+    # 'arc-challenge',
     # 'sciq',
-    'mnli',
-    # 'hellaswag',
+    # 'mnli',
+    'hellaswag',
     # 'yelp',
     # 'piqa',
     # 'mathqa',
@@ -166,13 +166,13 @@ LoRA_ranks = {
 
 methods = [
     # 'full_finetuning',
-    'lora_1',
-    'lora_2',
-    'lora_4',
-    # 'lora_8',
-    'lora_16',
-    'lora_32',
-    'lora_64',
+    # 'lora_1',
+    # 'lora_2',
+    # 'lora_4',
+    # # 'lora_8',
+    # 'lora_16',
+    # 'lora_32',
+    # 'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -182,9 +182,9 @@ methods = [
 model_specific_lora_ranks = {}
 
 coefficients = [
-    0.2,
-    0.4,
-    0.6,
+    # 0.2,
+    # 0.4,
+    # 0.6,
     0.8
 ]
 
@@ -193,7 +193,7 @@ _, max_scores = get_data('case-hold')
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
     if LoRA_ranks[model] != 1:
-        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+        # model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
         for coefficient in coefficients:
             model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
