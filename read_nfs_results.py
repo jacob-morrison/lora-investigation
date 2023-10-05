@@ -37,7 +37,7 @@ for elem in os.walk(start_dir):
             rank = dir_tokens[-2].split('_')[-1]
         else:
             method = 'full finetuning'
-            rank = -1
+            rank = '-1'
         task = dir_tokens[-3]
         model = dir_tokens[-4]
         print('seed: ' + seed)
