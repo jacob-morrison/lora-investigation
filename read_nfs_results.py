@@ -26,6 +26,7 @@ tasks = [
     'squad',
 ]
 
+results = {}
 start_dir = '/net/nfs.cirrascale/allennlp/jacobm/lora-investigation/' # 'llama2-7b/sciq/lora_2521/'
 for elem in os.walk(start_dir):
     if os.path.isfile(elem[0] + '/metrics.json'):
@@ -33,7 +34,7 @@ for elem in os.walk(start_dir):
         dir_tokens = dir.split('/')
         seed = dir_tokens[-1].split('_')[-1]
         if 'lora' in dir_tokens[-2]:
-            method = 'lora'
+            method = dir_tokens[-2]
             rank = dir_tokens[-2].split('_')[-1]
         else:
             method = 'full finetuning'
@@ -47,5 +48,12 @@ for elem in os.walk(start_dir):
         print('model: ' + model)
         with open(dir + '/metrics.json') as f:
             data = json.load(f)
-        print(data)
-        print()
+        if model not in results:
+            results[model] = {}
+        if task not in results[model]:
+            results[model][task] = {}
+        if method not in results[model][task]:
+            results[model][task][method] = {}
+        if seed not in results[model][task][method]:
+            results[model][task][method][seed] = data['eval_accuracy']
+pprint(results)
