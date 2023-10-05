@@ -15,7 +15,7 @@
 #     --evaluation_strategy steps --eval_steps 10 \
 #     --save_strategy steps --save_steps 20 --max_steps 60 \
 #     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-#     --gradient_accumulation_steps 1 --dataloader_pin_memory False
+#     --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1
 
 # # sciq
 # accelerate launch \
@@ -34,7 +34,7 @@
 #     --evaluation_strategy steps --eval_steps 1250 \
 #     --save_strategy steps --save_steps 1250 --max_steps 18750 \
 #     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-#     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+#     --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 # accelerate launch \
 #     --use_deepspeed \
@@ -52,7 +52,7 @@
 #     --evaluation_strategy steps --eval_steps 1250 \
 #     --save_strategy steps --save_steps 1250 --max_steps 18750 \
 #     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-#     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+#     --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 # in progress on allennlp cirrascale
 # accelerate launch \
@@ -71,7 +71,7 @@
 #     --evaluation_strategy steps --eval_steps 1250 \
 #     --save_strategy steps --save_steps 1250 --max_steps 18750 \
 #     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-#     --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+#     --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 # case hold
 accelerate launch \
@@ -90,7 +90,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 accelerate launch \
     --use_deepspeed \
@@ -108,7 +108,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 accelerate launch \
     --use_deepspeed \
@@ -126,7 +126,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 # sciq - LoRA
 accelerate launch \
@@ -145,7 +145,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 accelerate launch \
     --use_deepspeed \
@@ -163,7 +163,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 accelerate launch \
     --use_deepspeed \
@@ -181,7 +181,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 # case hold
 accelerate launch \
@@ -200,7 +200,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 accelerate launch \
     --use_deepspeed \
@@ -218,7 +218,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1 &&
 
 accelerate launch \
     --use_deepspeed \
@@ -236,7 +236,7 @@ accelerate launch \
     --evaluation_strategy steps --eval_steps 1250 \
     --save_strategy steps --save_steps 1250 --max_steps 18750 \
     --learning_rate 1e-4 --per_device_train_batch_size 1 --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 1 --dataloader_pin_memory False
+    --gradient_accumulation_steps 1 --dataloader_pin_memory False --eval_accumulation_steps 1
 
     
 

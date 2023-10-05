@@ -219,6 +219,14 @@ def parse_args():
 #             print(task, results_by_task[f"{metric}_for_{task}"])
 #         print()
 
+# preprocess squad this way?
+for i in range(len(inputs['offset_mapping'])):
+    if inputs['offset_mapping'][i][0] == start_char - 1:
+        start_token = i
+    elif inputs['offset_mapping'][i][0] == end_char + 1:
+        end_token = i
+        break
+
 class LlamaForQuestionAnswering(LlamaPretrainedModel):
     def __init__(self, config):
         super().__init__(config)
