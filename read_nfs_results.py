@@ -1,6 +1,5 @@
 import csv
 from pprint import pprint
-import pandas as pd
 import os
 
 seeds = [
