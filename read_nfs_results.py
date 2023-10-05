@@ -27,4 +27,5 @@ tasks = [
 
 start_dir = '/net/nfs.cirrascale/allennlp/jacobm/lora-investigation/' # 'llama2-7b/sciq/lora_2521/'
 for elem in os.walk(start_dir):
-    print(elem)
+    if os.path.isfile(elem + '/metrics.json'):
+        print(elem)
