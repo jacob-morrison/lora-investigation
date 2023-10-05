@@ -26,8 +26,8 @@ def set_argument_value(arguments, name, value):
 # ---- run all experiments ---- #
 seeds = [
     # 1,
-    2,
-    # 3,
+    # 2,
+    3,
     # 4,
     # 5,
 ]
@@ -40,8 +40,8 @@ experiments = [
     # 'arc-challenge',
     # 'sciq',
     # 'mnli',
-    'hellaswag',
-    # 'yelp',
+    # 'hellaswag',
+    'yelp',
     # 'piqa',
     # 'mathqa',
 
