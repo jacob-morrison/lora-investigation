@@ -48,12 +48,12 @@ for elem in os.walk(start_dir):
         print('model: ' + model)
         with open(dir + '/metrics.json') as f:
             data = json.load(f)
-        if model not in results:
-            results[model] = {}
-        if task not in results[model]:
-            results[model][task] = {}
-        if method not in results[model][task]:
-            results[model][task][method] = {}
-        if seed not in results[model][task][method]:
-            results[model][task][method][seed] = data['eval_accuracy']
+        if task not in results:
+            results[task] = {}
+        if model not in results[task]:
+            results[task][model] = {}
+        if method not in results[task][model]:
+            results[task][model][method] = {'1e-4': {}}
+        if seed not in results[task][model][method]['1e-4']:
+            results[task][model][method]['1e-4'][seed] = data['eval_accuracy']
 pprint(results)
