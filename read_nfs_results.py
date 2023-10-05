@@ -26,4 +26,5 @@ tasks = [
 ]
 
 start_dir = '/net/nfs.cirrascale/allennlp/jacobm/lora-investigation/' # 'llama2-7b/sciq/lora_2521/'
-print(os.walk(start_dir))
+for elem in os.walk(start_dir):
+    print(elem)
