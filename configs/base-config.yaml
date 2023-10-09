@@ -11,7 +11,7 @@ tasks:
       - name: GITHUB_REPO
         value: jacob-morrison/lora-investigation
       - name: GIT_REF
-        value: 3d965955b6cc0c3967e734e8c50790771d52e78d
+        value: bedce350097e99fce0a3d9a47ae7e5c6745ed5c0
       - name: PYTHON_VERSION
         value: "3.9"
       - name: PIP_REQUIREMENTS_FILE
@@ -35,6 +35,8 @@ tasks:
                     # Seed
                     # Learning Rate
                     # Task
+      - name: WANDB_MODE
+        value: disabled
     datasets:
       - mountPath: /gantry
         source:
