@@ -60,9 +60,9 @@ do
             --use_lora True --lora_rank ${RANK} \
             --save_total_limit 1 \
             --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
-            --evaluation_strategy steps --eval_steps 1250 \
-            --save_strategy steps --save_steps 1250 --max_steps 18750 \
-            --learning_rate ${LR} --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+            --evaluation_strategy steps --eval_steps 625 \
+            --save_strategy steps --save_steps 625 --max_steps 9375 \
+            --learning_rate ${LR} --per_device_train_batch_size 2 --per_device_eval_batch_size 8 \
             --gradient_accumulation_steps 1 --dataloader_pin_memory False
     done
 done
