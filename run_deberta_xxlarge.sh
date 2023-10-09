@@ -24,6 +24,11 @@
 # done
 
 RANK=8
+NUM_GPUS=8
+TRAIN_BATCH_SIZE=8
+EVAL_BATCH_SIZE=32
+MAX_STEPS=$((150000/$NUM_GPUS/$TRAIN_BATCH_SIZE))
+SAVE_STEPS=$((10000/$NUM_GPUS/$TRAIN_BATCH_SIZE))
 for SEED in 1 2 3
 do
     for LR in 1e-7
@@ -43,9 +48,9 @@ do
             --use_lora True --lora_rank ${RANK} \
             --save_total_limit 1 \
             --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
-            --evaluation_strategy steps --eval_steps 1250 \
-            --save_strategy steps --save_steps 1250 --max_steps 18750 \
-            --learning_rate ${LR} --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
+            --evaluation_strategy steps --eval_steps ${SAVE_STEPS} \
+            --save_strategy steps --save_steps ${SAVE_STEPS} --max_steps ${MAX_STEPS} \
+            --learning_rate ${LR} --per_device_train_batch_size ${TRAIN_BATCH_SIZE} --per_device_eval_batch_size ${EVAL_BATCH_SIZE} \
             --gradient_accumulation_steps 1 --dataloader_pin_memory False" &&
         accelerate launch \
             --use_deepspeed \
@@ -60,9 +65,9 @@ do
             --use_lora True --lora_rank ${RANK} \
             --save_total_limit 1 \
             --load_best_model_at_end --metric_for_best_model accuracy --greater_is_better True \
-            --evaluation_strategy steps --eval_steps 625 \
-            --save_strategy steps --save_steps 625 --max_steps 9375 \
-            --learning_rate ${LR} --per_device_train_batch_size 2 --per_device_eval_batch_size 8 \
+            --evaluation_strategy steps --eval_steps ${SAVE_STEPS} \
+            --save_strategy steps --save_steps ${SAVE_STEPS} --max_steps ${MAX_STEPS} \
+            --learning_rate ${LR} --per_device_train_batch_size ${TRAIN_BATCH_SIZE} --per_device_eval_batch_size ${EVAL_BATCH_SIZE} \
             --gradient_accumulation_steps 1 --dataloader_pin_memory False
     done
 done
