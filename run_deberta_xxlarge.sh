@@ -46,6 +46,6 @@ do
             --evaluation_strategy steps --eval_steps 1250 \
             --save_strategy steps --save_steps 1250 --max_steps 18750 \
             --learning_rate ${LR} --per_device_train_batch_size 1 --per_device_eval_batch_size 8 \
-            --gradient_accumulation_steps 1 --dataloader_pin_memory False
+            --gradient_accumulation_steps 1 --dataloader_pin_memory False &&
     done
 done
