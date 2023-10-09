@@ -1,6 +1,7 @@
 import csv
 from pprint import pprint
 import pandas as pd
+import json
 
 def read_results_file(task):
     data = {}
@@ -89,8 +90,40 @@ def create_data_frame(data):
     # flatten by building a list of maps, model + method + rank (if applicable) + LR + seed
     return pd.DataFrame(blobs), max_scores
 
+def transform_lora_name(method):
+    if method == 'full finetuning':
+        return 'Full Finetuning'
+    if '_' in method:
+        rank = method.split('_')[-1]
+        if rank == 'Full Finetuning':
+            return rank
+        return 'LoRA ' + rank
+    else:
+        return method
+
+with open('results/nfs-results.json') as f:
+    nfs_data = json.load(f)
+reformatted_data = {}
+for task in nfs_data:
+    reformatted_data[task] = {}
+    for model in nfs_data[task]:
+        reformatted_data[task][model] = {}
+        for method in nfs_data[task][model]:
+            reformatted_data[task][model][transform_lora_name(method)] = {}
+            for seed in nfs_data[task][model][method]:
+                reformatted_data[task][model][transform_lora_name(method)][seed] = nfs_data[task][model][method][seed]
+
+pprint(reformatted_data)
+
 def get_data(task):
-    return create_data_frame(read_results_file(task))
+    results = read_results_file(task)
+    if task == 'case-hold':
+        for model in reformatted_data['case-hold']:
+            results[model] = reformatted_data['case-hold'][model]
+    if task == 'sciq':
+        for model in reformatted_data['sciq']:
+            results[model] = reformatted_data['sciq'][model]
+    return create_data_frame(results)
 
 tasks = [
     'case-hold',
@@ -127,13 +160,13 @@ models = {
     ### decoder only ###
     'gpt2': 1,
     'gpt2-large': 4,
-    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
+    'llama2-7b': 8, # probably use llama 2 instead?
 
     ### encoder/decoder ###
     ### single task ###
     'google/t5-small-lm-adapt': 1,
     'google/t5-large-lm-adapt': 4,
-    'google/t5-xxl-lm-adapt': 8,
+    't5-xxl': 8,
 
     ### multi task ###
     'jacobmorrison/tk-instruct-small-lora-experiments': 1,
@@ -148,11 +181,11 @@ LoRA_ranks = {
 
     'gpt2': 3376,
     'gpt2-large': 4200,
-    '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
+    'llama2-7b': 12603, # probably use llama 2 instead?
 
     'google/t5-small-lm-adapt': 1414,
     'google/t5-large-lm-adapt': 2548,
-    'google/t5-xxl-lm-adapt': 8,
+    't5-xxl': 8,
 
     'jacobmorrison/tk-instruct-small-lora-experiments': 1413,
     'jacobmorrison/tk-instruct-large-lora-experiments': 2548,
@@ -168,15 +201,6 @@ coefficients = [
     0.6,
     0.8
 ]
-
-def transform_lora_name(method):
-    if '_' in method:
-        rank = method.split('_')[-1]
-        if rank == 'Full Finetuning':
-            return rank
-        return 'LoRA ' + rank
-    else:
-        return method
     
 from math import ceil
 

@@ -41,9 +41,9 @@ experiments = [
     # 'sciq',
     # 'mnli',
     # 'hellaswag',
-    'yelp',
+    # 'yelp',
     # 'piqa',
-    # 'mathqa',
+    'mathqa',
 
 
     # 'squad',
@@ -169,7 +169,7 @@ methods = [
     # 'lora_1',
     # 'lora_2',
     # 'lora_4',
-    # # 'lora_8',
+    # 'lora_8',
     # 'lora_16',
     # 'lora_32',
     # 'lora_64',
@@ -185,7 +185,7 @@ coefficients = [
     # 0.2,
     # 0.4,
     # 0.6,
-    0.8
+    # 0.8
 ]
 
 _, max_scores = get_data('case-hold')
@@ -193,7 +193,7 @@ _, max_scores = get_data('case-hold')
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
     if LoRA_ranks[model] != 1:
-        # model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
         for coefficient in coefficients:
             model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
