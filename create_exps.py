@@ -25,15 +25,15 @@ def set_argument_value(arguments, name, value):
 
 # ---- run all experiments ---- #
 seeds = [
-    # 1,
-    # 2,
+    1,
+    2,
     3,
     # 4,
     # 5,
 ]
 
 experiments = [
-    # 'case-hold',
+    'case-hold',
 
     # 'qnli',
     # 'arc-easy',
@@ -43,7 +43,7 @@ experiments = [
     # 'hellaswag',
     # 'yelp',
     # 'piqa',
-    'mathqa',
+    # 'mathqa',
 
 
     # 'squad',
@@ -57,12 +57,13 @@ learning_rates = [
     # TODO: limit which we choose
     # '1e-3',
     # '5e-4',
-    '1e-4',
+    # '1e-4',
     # '5e-5',
     # '1e-5',
     # '5e-6',
     # '1e-6',
     # '5e-7',
+    '1e-7'
 ]
 
 models = {
@@ -95,11 +96,11 @@ models = {
     ### encoder only ###
     # 'microsoft/deberta-v3-xsmall': 1,
     # 'microsoft/deberta-v3-large': 2,
-    # 'microsoft/deberta-v2-xxlarge': 4,
+    'microsoft/deberta-v2-xxlarge': 4,
 
     ### decoder only ###
     # 'gpt2': 1,
-    'gpt2-large': 4,
+    # 'gpt2-large': 4,
     # '/net/nfs.cirrascale/allennlp/yizhongw/hf_llama2_models/7B': 8, # probably use llama 2 instead?
 
     ### encoder/decoder ###
@@ -169,7 +170,7 @@ methods = [
     # 'lora_1',
     # 'lora_2',
     # 'lora_4',
-    # 'lora_8',
+    'lora_8',
     # 'lora_16',
     # 'lora_32',
     # 'lora_64',
@@ -182,20 +183,20 @@ methods = [
 model_specific_lora_ranks = {}
 
 coefficients = [
-    # 0.2,
-    # 0.4,
-    # 0.6,
-    # 0.8
+    0.2,
+    0.4,
+    0.6,
+    0.8
 ]
 
 _, max_scores = get_data('case-hold')
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    if LoRA_ranks[model] != 1:
-        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-        for coefficient in coefficients:
-            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    # if LoRA_ranks[model] != 1:
+    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+    #     for coefficient in coefficients:
+    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:
@@ -216,11 +217,11 @@ for experiment in experiments:
             for learning_rate in learning_rates:
                 for method in methods + model_specific_lora_ranks[model]:
                     print(learning_rate)
-                    if model in max_scores:
-                        if method == 'full_finetuning':
-                            learning_rate = max_scores[model]['Full Finetuning']['best learning rate']
-                        else:
-                            learning_rate = max_scores[model]['LoRA ' + method.split('_')[-1]]['best learning rate']
+                    # if model in max_scores:
+                    #     if method == 'full_finetuning':
+                    #         learning_rate = max_scores[model]['Full Finetuning']['best learning rate']
+                    #     else:
+                    #         learning_rate = max_scores[model]['LoRA ' + method.split('_')[-1]]['best learning rate']
                     print(learning_rate)
 
                     if model in xl_models:

@@ -32,7 +32,7 @@ def read_results_file(task):
                 # print(data[row['env_MODEL']][method][row['env_LEARNING_RATE']])
     return data
 
-def create_data_frame(data):
+def create_data_frame(data, task):
     max_scores = {}
 
     blobs = []
@@ -69,23 +69,24 @@ def create_data_frame(data):
                         max_scores[model][method]['highest learning rate'] = learning_rate
 
 
-    pprint(max_scores)
-    print()
+    if task == 'case-hold':
+        pprint(max_scores)
+        print()
 
-    for model in max_scores:
-        for method in max_scores[model]:
-            if max_scores[model][method]['best learning rate'] == max_scores[model][method]['lowest learning rate']: 
-                print('Best matches lowest LR:')
-                print(model)
-                print(method)
-                print(max_scores[model][method])
-                print()
-            elif max_scores[model][method]['best learning rate'] == max_scores[model][method]['highest learning rate']:
-                print('Best matches highest LR:')
-                print(model)
-                print(method)
-                print(max_scores[model][method])
-                print()
+        for model in max_scores:
+            for method in max_scores[model]:
+                if max_scores[model][method]['best learning rate'] == max_scores[model][method]['lowest learning rate']: 
+                    print('Best matches lowest LR:')
+                    print(model)
+                    print(method)
+                    print(max_scores[model][method])
+                    print()
+                elif max_scores[model][method]['best learning rate'] == max_scores[model][method]['highest learning rate']:
+                    print('Best matches highest LR:')
+                    print(model)
+                    print(method)
+                    print(max_scores[model][method])
+                    print()
 
     # flatten by building a list of maps, model + method + rank (if applicable) + LR + seed
     return pd.DataFrame(blobs), max_scores
@@ -123,7 +124,7 @@ def get_data(task):
     if task == 'sciq':
         for model in reformatted_data['sciq']:
             results[model] = reformatted_data['sciq'][model]
-    return create_data_frame(results)
+    return create_data_frame(results, task)
 
 tasks = [
     'case-hold',
@@ -227,7 +228,7 @@ for task in max_scores:
                 best_scores[model][method] = {}
             best_scores[model][method][task] = max_scores[task][model][method]['best score']
 
-pprint(best_scores)
+# pprint(best_scores)
 
 # Model	Method	CaseHOLD	QNLI	ARC Easy	ARC Challenge	SciQ	MNLI	HellaSwag	Yelp	PIQA	MathQA	SQuAD
 with open('results/combined-results.csv', 'w') as f:
