@@ -24,6 +24,7 @@
 # done
 
 RANK=8
+TASK=case-hold
 NUM_GPUS=8
 TRAIN_BATCH_SIZE=8
 EVAL_BATCH_SIZE=32
@@ -33,13 +34,13 @@ for SEED in 1 2 3
 do
     for LR in 1e-7
     do
-        directory=/net/nfs.cirrascale/allennlp/jacobm/lora-investigation/deberta-v2-xxlarge/case-hold/lora_${RANK}/seed_${SEED}/${LR}/
+        directory=/net/nfs.cirrascale/allennlp/jacobm/lora-investigation/deberta-v2-xxlarge/${TASK}/lora_${RANK}/seed_${SEED}/${LR}/
         mkdir -p ${directory} &&
         echo "        accelerate launch \
             --use_deepspeed \
             --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
             experiments/sequence_classification.py \
-            --task_name sciq \
+            --task_name ${TASK} \
             --model_name_or_path microsoft/deberta-v2-xxlarge \
             --output_dir ${directory} \
             --seed ${SEED} \
@@ -56,7 +57,7 @@ do
             --use_deepspeed \
             --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
             experiments/sequence_classification.py \
-            --task_name sciq \
+            --task_name ${TASK} \
             --model_name_or_path microsoft/deberta-v2-xxlarge \
             --output_dir ${directory} \
             --seed ${SEED} \
