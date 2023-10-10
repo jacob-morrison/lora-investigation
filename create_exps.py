@@ -33,10 +33,10 @@ seeds = [
 ]
 
 experiments = [
-    'case-hold',
+    # 'case-hold',
 
-    # 'qnli',
-    # 'arc-easy',
+    'qnli',
+    'arc-easy',
     # 'arc-challenge',
     # 'sciq',
     # 'mnli',
@@ -96,7 +96,7 @@ models = {
     ### encoder only ###
     # 'microsoft/deberta-v3-xsmall': 1,
     # 'microsoft/deberta-v3-large': 2,
-    'microsoft/deberta-v2-xxlarge': 4,
+    # 'microsoft/deberta-v2-xxlarge': 4,
 
     ### decoder only ###
     # 'gpt2': 1,
@@ -106,7 +106,7 @@ models = {
     ### encoder/decoder ###
     ### single task ###
     # 'google/t5-small-lm-adapt': 1,
-    # 'google/t5-large-lm-adapt': 4,
+    'google/t5-large-lm-adapt': 4,
     # 'google/t5-xxl-lm-adapt': 8,
 
     ### multi task ###
@@ -167,13 +167,13 @@ LoRA_ranks = {
 
 methods = [
     # 'full_finetuning',
-    # 'lora_1',
-    # 'lora_2',
-    # 'lora_4',
-    'lora_8',
-    # 'lora_16',
-    # 'lora_32',
-    # 'lora_64',
+    'lora_1',
+    'lora_2',
+    'lora_4',
+    # 'lora_8',
+    'lora_16',
+    'lora_32',
+    'lora_64',
     
     # TODO: programmatically add 20%, 40%, 60%, 80%, 100% trainable parameters
 ]
@@ -193,10 +193,10 @@ _, max_scores = get_data('case-hold')
     
 for model in LoRA_ranks:
     model_specific_lora_ranks[model] = []
-    # if LoRA_ranks[model] != 1:
-    #     model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
-    #     for coefficient in coefficients:
-    #         model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
+    if LoRA_ranks[model] != 1:
+        model_specific_lora_ranks[model].append('lora_' + str(int(LoRA_ranks[model])))
+        for coefficient in coefficients:
+            model_specific_lora_ranks[model].append('lora_' + str(int(ceil(coefficient * LoRA_ranks[model]))))
 
 
 for experiment in experiments:
@@ -217,11 +217,11 @@ for experiment in experiments:
             for learning_rate in learning_rates:
                 for method in methods + model_specific_lora_ranks[model]:
                     print(learning_rate)
-                    # if model in max_scores:
-                    #     if method == 'full_finetuning':
-                    #         learning_rate = max_scores[model]['Full Finetuning']['best learning rate']
-                    #     else:
-                    #         learning_rate = max_scores[model]['LoRA ' + method.split('_')[-1]]['best learning rate']
+                    if model in max_scores:
+                        if method == 'full_finetuning':
+                            learning_rate = max_scores[model]['Full Finetuning']['best learning rate']
+                        else:
+                            learning_rate = max_scores[model]['LoRA ' + method.split('_')[-1]]['best learning rate']
                     print(learning_rate)
 
                     if model in xl_models:
@@ -246,7 +246,10 @@ for experiment in experiments:
                     d['tasks'][0]['envVars'][10]['value'] = experiment # TASK
                     d['tasks'][0]['resources']['gpuCount'] = num_gpus
                     if experiment in ['hellaswag', 'yelp', 'mathqa', 'piqa', 'qnli']:
-                        d['tasks'][0]['arguments'].remove('--do_pred')
+                        if '--do_pred' in  d['tasks'][0]['arguments']:
+                            d['tasks'][0]['arguments'].remove('--do_pred')
+                        if '--do_predict' in  d['tasks'][0]['arguments']:
+                            d['tasks'][0]['arguments'].remove('--do_predict')
 
                     for i in range(len(d['tasks'][0]['arguments'])):
                         if '$EXPERIMENT' in d['tasks'][0]['arguments'][i]:

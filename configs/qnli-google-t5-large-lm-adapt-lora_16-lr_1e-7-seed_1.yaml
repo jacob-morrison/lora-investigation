@@ -1,0 +1,24 @@
+{description: qnli-google-t5-large-lm-adapt-lora_16-lr_1e-7-seed_1, tasks: [{arguments: [
+        accelerate, launch, --use_deepspeed, --deepspeed_config_file, ds_configs/stage3_no_offloading_accelerate.conf,
+        experiments/sequence_classification.py, --task_name, qnli, --model_name_or_path,
+        google/t5-large-lm-adapt, --output_dir, /results/, --do_train, --do_eval,
+        --max_seq_length, '512', --use_lora, 'True', --lora_rank, '16', --save_total_limit,
+        '1', --load_best_model_at_end, --metric_for_best_model, accuracy, --greater_is_better,
+        'True', --evaluation_strategy, steps, --eval_steps, '1250', --save_strategy,
+        steps, --save_steps, '1250', --max_steps, '18750', --learning_rate, 1e-7,
+        --per_device_train_batch_size, '2', --per_device_eval_batch_size, '8', --seed,
+        '1', --gradient_accumulation_steps, '1', --dataloader_pin_memory, 'False'],
+      command: [bash, /gantry/entrypoint.sh], constraints: {cluster: [ai2/allennlp-elanding-a100-40g,
+          ai2/allennlp-cirrascale, ai2/climate-cirrascale, ai2/general-cirrascale,
+          ai2/general-cirrascale-a100-80g-ib, ai2/general-cirrascale-a5000, ai2/aristo-cirrascale,
+          ai2/aristo-elanding-a6000, ai2/mosaic-cirrascale, ai2/mosaic-cirrascale-a100,
+          ai2/mosaic-elanding-rtx8000, ai2/s2-cirrascale, ai2/s2-elanding]}, context: {
+        priority: preemptible}, datasets: [{mountPath: /gantry, source: {beaker: 01H5B0SAY5E4KKEXX71RN079Q6}}],
+      envVars: [{name: GANTRY_VERSION, value: 0.17.0}, {name: GITHUB_REPO, value: jacob-morrison/lora-investigation},
+        {name: GIT_REF, value: d63874f1ea4fd34ec22b183d858d25e22e250aba}, {name: PYTHON_VERSION,
+          value: '3.9'}, {name: PIP_REQUIREMENTS_FILE, value: requirements.txt}, {
+          name: MODEL, value: google/t5-large-lm-adapt}, {name: METHOD, value: LoRA},
+        {name: RANK, value: '16'}, {name: SEED, value: 1}, {name: LEARNING_RATE, value: 1e-7},
+        {name: TASK, value: qnli}, {name: WANDB_MODE, value: disabled}], image: {
+        beaker: jacobm/lora-instruct}, name: qnli-google-t5-large-lm-adapt-lora_16-lr_1e-7-seed_1,
+      resources: {gpuCount: 4}, result: {path: /results}}], version: v2}
