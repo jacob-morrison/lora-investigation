@@ -35,15 +35,15 @@ seeds = [
 experiments = [
     # 'case-hold',
 
-    'qnli',
-    'arc-easy',
+    # 'qnli',
+    # 'arc-easy',
     # 'arc-challenge',
     # 'sciq',
     # 'mnli',
     # 'hellaswag',
-    # 'yelp',
-    # 'piqa',
-    # 'mathqa',
+    'yelp',
+    'piqa',
+    'mathqa',
 
 
     # 'squad',
