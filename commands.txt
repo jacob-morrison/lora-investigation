@@ -11,6 +11,7 @@ gantry run \
         --priority high \
         --dataset '01HC32D2FX1DF27Y8C4XB4G3Q0:/model/' \
     -- python -u experiments/merge_and_eval.py \
+        --output_dir '/results/' 
         --task_name case_hold \
         --model_name_or_path ${MODEL_NAME} \
         --do_eval \
@@ -25,6 +26,8 @@ gantry run \
         # --bf16 \ # use for llama
         # --fp16 \
         # --fp16_full_eval 
+
+# /net/nfs.cirrascale/allennlp/jacobm/interpolations-results/
 
 gantry run --beaker-image 'ai2/pytorch1.13.0-cuda11.6-python3.9' --workspace ai2/lexglue-tasks --cluster ai2/general-cirrascale \\
     --conda environment.yml --gpus 1 --priority high \\

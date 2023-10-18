@@ -256,7 +256,7 @@ for target_model_weight, base_model_weight in model_weights:
         prefix = "full-finetuning"
 
     os.rename(
-        '/results/all_results.json',
-        f'/net/nfs.cirrascale/allennlp/jacobm/interpolations-results/{model_args.model_name_or_path.replace("/", "-")}-{prefix}-{training_args.learning_rate}-{training_args.seed}-target-weight-{target_model_weight}-base-weight-{base_model_weight}-metrics.json'
+        os.path.join(training_args.output_dir, 'all_results.json'),
+        os.path.join(training_args.output_dir, f'{model_args.model_name_or_path.replace("/", "-")}-{prefix}-{training_args.learning_rate}-{training_args.seed}-target-weight-{target_model_weight}-base-weight-{base_model_weight}-metrics.json')
     )
 
