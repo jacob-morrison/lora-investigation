@@ -1,3 +1,31 @@
+# merge command
+# dataset: 	01HC32D2FX1DF27Y8C4XB4G3Q0
+MODEL_NAME=microsoft/deberta-v3-xsmall
+gantry run \
+        --beaker-image 'jacobm/lora-instruct' \
+        --workspace ai2/interpolations \
+        --cluster ai2/general-cirrascale \
+        --cluster ai2/allennlp-cirrascale \
+        --pip requirements.txt \
+        --gpus 1 \
+        --priority high \
+        --dataset '01HC32D2FX1DF27Y8C4XB4G3Q0:/model/' \
+    -- python -u experiments/merge_and_eval.py \
+        --task_name case_hold \
+        --model_name_or_path ${MODEL_NAME} \
+        --do_eval \
+        --do_predict \
+        --use_lora False \
+        --lora_rank 8 \
+        --seed 1 \
+        --per_device_eval_batch_size 8 \
+        --max_seq_length 512 \
+        --eval_accumulation_steps 1
+
+        # --bf16 \ # use for llama
+        # --fp16 \
+        # --fp16_full_eval 
+
 gantry run --beaker-image 'ai2/pytorch1.13.0-cuda11.6-python3.9' --workspace ai2/lexglue-tasks --cluster ai2/general-cirrascale \\
     --conda environment.yml --gpus 1 --priority high \\
     --dataset 'merge-t5-xl-sa-low:/t5-model' \\
