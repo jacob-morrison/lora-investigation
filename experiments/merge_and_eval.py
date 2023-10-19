@@ -217,6 +217,9 @@ if model_args.use_lora:
         model_args.model_name_or_path,
         config=config
     )
+    embedding_size = lora_base_model.get_input_embeddings().weight.shape[0]
+    if len(tokenizer) > embedding_size:
+        lora_base_model.resize_token_embeddings(len(tokenizer))
     lora_model = PeftModel.from_pretrained(lora_base_model, target_model_path)
     model_to_merge = lora_model.base_model.merge_and_unload()
     print("Done merging lora modules")
