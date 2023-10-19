@@ -123,7 +123,10 @@ parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainin
 parser.add_argument("-b", "--base_model", help = "Which base model", type = str)
 model_args, data_args, training_args, custom_args = parser.parse_args_into_dataclasses()
 
-tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
+tokenizer = AutoTokenizer.from_pretrained(
+    model_args.model_name_or_path,
+    use_fast=data_args.task_name != 'case-hold',
+)
 
 if 't5' in model_args.model_name_or_path or 'tk' in model_args.model_name_or_path:
     eval_dataset = \
