@@ -213,7 +213,10 @@ base_model = AutoModelForSequenceClassification.from_pretrained(
 
 if model_args.use_lora:
     print("Merging the lora modules...")
-    lora_base_model = AutoModelForSequenceClassification.from_pretrained(model_args.model_name_or_path)
+    lora_base_model = AutoModelForSequenceClassification.from_pretrained(
+        model_args.model_name_or_path,
+        config=config
+    )
     lora_model = PeftModel.from_pretrained(lora_base_model, target_model_path)
     model_to_merge = lora_model.base_model.merge_and_unload()
     print("Done merging lora modules")
