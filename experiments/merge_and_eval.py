@@ -218,6 +218,7 @@ if model_args.use_lora:
         config=config
     )
     embedding_size = lora_base_model.get_input_embeddings().weight.shape[0]
+    print('original target embedding size: ' + str(embedding_size))
     if len(tokenizer) > embedding_size:
         lora_base_model.resize_token_embeddings(len(tokenizer))
     lora_model = PeftModel.from_pretrained(lora_base_model, target_model_path)
