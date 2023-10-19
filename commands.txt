@@ -12,11 +12,11 @@ gantry run \
         --dataset '01HC32D2FX1DF27Y8C4XB4G3Q0:/model/' \
     -- python -u experiments/merge_and_eval.py \
         --output_dir '/results/' \
-        --task_name case-hold \
+        --task_name mnli \
         --model_name_or_path ${MODEL_NAME} \
         --do_eval \
         --do_predict \
-        --use_lora False \
+        --use_lora True \
         --lora_rank 8 \
         --seed 1 \
         --per_device_eval_batch_size 8 \
