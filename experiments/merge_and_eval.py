@@ -153,7 +153,7 @@ else:
             max_samples=data_args.max_eval_samples,
         )
 
-if data_args.do_predict:
+if training_args.do_predict:
     if 't5' in model_args.model_name_or_path or 'tk' in model_args.model_name_or_path:
         predict_dataset = \
             T2TMultipleChoiceDataset(
