@@ -8,6 +8,7 @@ from transformers import (
     EvalPrediction,
     Seq2SeqTrainingArguments,
     DataCollatorForSeq2Seq,
+    AutoConfig,
 )
 from dataclasses import dataclass, field
 from typing import Optional
@@ -181,8 +182,34 @@ if training_args.do_predict:
 
 new_state_dict = OrderedDict()
 
+num_classes = {
+		'case-hold': 5,
+		'qnli': 2,
+		'arc-easy': 4,
+		'arc-challenge': 4,
+		'sciq': 4,
+		'hellaswag': 4,
+		'mnli': 3,
+		'yelp': 2,
+		'mathqa': 5,
+		'piqa': 2,
+	}
+
+# Load pretrained model and tokenizer
+config = AutoConfig.from_pretrained(
+    model_args.config_name if model_args.config_name else model_args.model_name_or_path,
+    num_labels=num_classes[data_args.task_name],
+    finetuning_task=data_args.task_name,
+    cache_dir=model_args.cache_dir,
+    token='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',
+)
+config.use_cache = False
+
 target_model_path = '/model/'
-base_model = AutoModelForSequenceClassification.from_pretrained(model_args.model_name_or_path)
+base_model = AutoModelForSequenceClassification.from_pretrained(
+    model_args.model_name_or_path,
+    config=config,
+)
 
 if model_args.use_lora:
     print("Merging the lora modules...")
