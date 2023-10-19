@@ -298,7 +298,7 @@ for target_model_weight, base_model_weight in model_weights:
     else:
         prefix = "full-finetuning"
 
-    os.mkdir(os.path.join(training_args.output_dir, f'{data_args.task_name}/{model_args.model_name_or_path.replace("/", "-")}-{prefix}-{training_args.learning_rate}-{training_args.seed}/'))
+    os.makedirs(os.path.join(training_args.output_dir, f'{data_args.task_name}/{model_args.model_name_or_path.replace("/", "-")}-{prefix}-{training_args.learning_rate}-{training_args.seed}/'), exist_ok=True)
 
     os.rename(
         os.path.join(training_args.output_dir, 'all_results.json'),
