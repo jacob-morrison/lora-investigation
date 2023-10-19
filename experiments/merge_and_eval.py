@@ -129,7 +129,7 @@ if 't5' in model_args.model_name_or_path or 'tk' in model_args.model_name_or_pat
     eval_dataset = \
         T2TMultipleChoiceDataset(
             tokenizer=tokenizer,
-            task=data_args.task,
+            task=data_args.task_name,
             device=training_args.device,
             max_seq_length=data_args.max_seq_length,
             overwrite_cache=False,
@@ -141,7 +141,7 @@ else:
     eval_dataset = \
         T2TMultipleChoiceDataset(
             tokenizer=tokenizer,
-            task=data_args.task,
+            task=data_args.task_name,
             device=training_args.device,
             max_seq_length=data_args.max_seq_length,
             overwrite_cache=False,
@@ -155,7 +155,7 @@ if data_args.do_predict:
         predict_dataset = \
             T2TMultipleChoiceDataset(
                 tokenizer=tokenizer,
-                task=data_args.task,
+                task=data_args.task_name,
                 device=training_args.device,
                 max_seq_length=data_args.max_seq_length,
                 overwrite_cache=False,
@@ -167,7 +167,7 @@ if data_args.do_predict:
         predict_dataset = \
             T2TMultipleChoiceDataset(
                 tokenizer=tokenizer,
-                task=data_args.task,
+                task=data_args.task_name,
                 device=training_args.device,
                 max_seq_length=data_args.max_seq_length,
                 overwrite_cache=False,
@@ -257,6 +257,6 @@ for target_model_weight, base_model_weight in model_weights:
 
     os.rename(
         os.path.join(training_args.output_dir, 'all_results.json'),
-        os.path.join(training_args.output_dir, f'{model_args.model_name_or_path.replace("/", "-")}-{prefix}-{training_args.learning_rate}-{training_args.seed}/target-weight-{target_model_weight}-base-weight-{base_model_weight}-metrics.json')
+        os.path.join(training_args.output_dir, f'{data_args.task_name}/{model_args.model_name_or_path.replace("/", "-")}-{prefix}-{training_args.learning_rate}-{training_args.seed}/target-weight-{target_model_weight}-base-weight-{base_model_weight}-metrics.json')
     )
 
