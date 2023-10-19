@@ -294,7 +294,7 @@ for target_model_weight, base_model_weight in model_weights:
     trainer.save_metrics("predict", metrics)
 
     if model_args.use_lora:
-        prefix = f"lora-{model_args.rank}"
+        prefix = f"lora-{model_args.lora_rank}"
     else:
         prefix = "full-finetuning"
 
