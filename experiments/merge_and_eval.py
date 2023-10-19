@@ -243,7 +243,10 @@ model_weights = [
     (0.9, 0.1),
     (1.0, 0.0),
 ]
-base_model.resize_token_embeddings(len(tokenizer))
+embedding_size = base_model.get_input_embeddings().weight.shape[0]
+print('original base embedding size: ' + str(embedding_size))
+if len(tokenizer) > embedding_size:
+    base_model.resize_token_embeddings(len(tokenizer))
 
 for target_model_weight, base_model_weight in model_weights:
     for key in base_model.state_dict():
