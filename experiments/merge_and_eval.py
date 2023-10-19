@@ -262,6 +262,8 @@ for target_model_weight, base_model_weight in model_weights:
     merged_model = AutoModelForSequenceClassification.from_pretrained(model_args.model_name_or_path, state_dict = new_state_dict, config=base_model.config)
     print('model device: ')
     print(merged_model.device)
+    merged_model.to(0)
+    print(merged_model.device)
     print()
     # Initialize our Trainer
     if 't5' in model_args.model_name_or_path or 'tk' in model_args.model_name_or_path:
