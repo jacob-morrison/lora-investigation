@@ -224,7 +224,10 @@ if model_args.use_lora:
     model_to_merge = lora_model.base_model.merge_and_unload()
     print("Done merging lora modules")
 else:
-    model_to_merge = AutoModelForSequenceClassification.from_pretrained(target_model_path)
+    model_to_merge = AutoModelForSequenceClassification.from_pretrained(
+        target_model_path,
+        config=config
+    )
 
 model_weights = [
     (0.0, 1.0),
