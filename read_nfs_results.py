@@ -33,6 +33,7 @@ for elem in os.walk(start_dir):
     if os.path.isfile(elem[0] + '/metrics.json'):
         dir = elem[0]
         dir_tokens = dir.split('/')
+        print(dir_tokens)
         seed = dir_tokens[-1].split('_')[-1]
         if 'lora' in dir_tokens[-2]:
             method = dir_tokens[-2]
@@ -42,11 +43,11 @@ for elem in os.walk(start_dir):
             rank = '-1'
         task = dir_tokens[-3]
         model = dir_tokens[-4]
-        print('seed: ' + seed)
-        print('method: ' + method)
-        print('rank: ' + rank)
-        print('task: ' + task)
-        print('model: ' + model)
+        # print('seed: ' + seed)
+        # print('method: ' + method)
+        # print('rank: ' + rank)
+        # print('task: ' + task)
+        # print('model: ' + model)
         with open(dir + '/metrics.json') as f:
             data = json.load(f)
         if task not in results:
