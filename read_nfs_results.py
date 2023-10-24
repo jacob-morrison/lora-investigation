@@ -53,7 +53,9 @@ for elem in os.walk(start_dir):
             if model not in results[task]:
                 results[task][model] = {}
             if method not in results[task][model]:
-                results[task][model][method] = {learning_rate: {}}
+                results[task][model][method] = {}
+            if learning_rate not in results[task][model][method]:
+                results[task][model][method][learning_rate] = {}
             if seed not in results[task][model][method][learning_rate]:
                 results[task][model][method][learning_rate][seed] = data['eval_accuracy']
         else:
