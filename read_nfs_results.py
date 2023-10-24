@@ -13,6 +13,7 @@ models = [
     'llama-7b',
     't5-xxl',
     'tk-xxl',
+    'deberta-v2-xxlarge',
     
     # 't5-xl',
     # 'tk-xl',
